@@ -51,4 +51,5 @@ Special values include Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, and D
 - args array starts at 0, the call to `java` and the file name are not included.
 - 2d arrays are initialzed like this: `int[][] square = new int[4][4]`
 - In method parameters, you can use something like this: `average(double... values)`, which can accept any number of arguments. It creates an array of the passed arguments. A parameter of this kind must be the last parameter of the method.
+- use an InputStream to read in files from a path object, and an OutputStream to write to a path
 - 
