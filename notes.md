@@ -44,4 +44,11 @@ Special values include Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, and D
 - `ArrayList` class can be used for arrays that grow and shrink on demand, and is part of the `java.utils` package.
 - Declare array types as follows: `int[] nums = new int[10]` - creates an array of 10 ints
 - or declare arrays with literal syntax: `int[] primes = {2, 3, 5, 7, 11, 13 };`
+- Wrapper classes are for primitive types, and include `Integer`, `Byte`, `Short`, `Long`, `Character`, `Float`, `Double`, and `Boolean`. These can be used with `ArrayList<Integer>`.
+- Autoboxing is the automatic conversion between primitive types and their corresponding wrapper types.
+- Use `equals` method with wrapper objects, since `==` and `!=` compare actual object references
+- Use the `Arrays` class for common array methods, and use the `Collections` class for common ArrayList methods
+- args array starts at 0, the call to `java` and the file name are not included.
+- 2d arrays are initialzed like this: `int[][] square = new int[4][4]`
+- In method parameters, you can use something like this: `average(double... values)`, which can accept any number of arguments. It creates an array of the passed arguments. A parameter of this kind must be the last parameter of the method.
 - 
