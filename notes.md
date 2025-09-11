@@ -2,10 +2,10 @@
 
 ## Java Fundamentals
 
-- Ojbect oriented language
+- Object oriented language
 - `javac` to compile and `java` to run
 
-Primitve Types
+Primitive Types
 
 Signed Integers
 
@@ -52,4 +52,17 @@ Special values include Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, and D
 - 2d arrays are initialzed like this: `int[][] square = new int[4][4]`
 - In method parameters, you can use something like this: `average(double... values)`, which can accept any number of arguments. It creates an array of the passed arguments. A parameter of this kind must be the last parameter of the method.
 - use an InputStream to read in files from a path object, and an OutputStream to write to a path
-- 
+
+### Objects and Classes
+
+- `Object` class is inherited by all Java objects. When inheriting, the class inherits all public and protected methods and fields
+- You must override the `equals` method to properly compare objects. If not overridden, it checks if the two objects are the exact same instance, which is not really helpful.
+- `hashCode` method is used by collections to check equality. First checks the two hashCodes, and if they match, it then calls the equals method
+- Fields are variables within the class and methods are operations the class performs (functions within the class)
+- `new` operator is used to create an instance of a class, called an object
+- `this` when used within the class code is a reference to the object itself, and only needs to be used in the event of a naming collision.
+- Can include a default constructor, one or more explicit constructors, and a copy constructor that takes as a parameter an object of the same type and makes a deep copy of that objects fields and puts them into the new object.
+- Data objects only exist to represent a collection of data fields, and exist only to serve as input or output for other objects that operate on them.
+- records are an object that represent a data object without you having to program the whole object.
+- `record PetRecord(int id, String name, String type) {}` creates a record object, that is immutable, with automatic getters, equals, hashcode, and toString methods
+- If needed, can also provide your own methods to the record in the {}
