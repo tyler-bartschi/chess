@@ -17,7 +17,7 @@ public abstract class PieceMoveCalculator {
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
             return possibleMoves;
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
-            return possibleMoves;
+            return KnightMoveCalculator.pieceMoves(board, myPosition);
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.QUEEN) {
             return possibleMoves;
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.KING) {
