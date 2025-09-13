@@ -9,12 +9,8 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPosition {
-    private final int row;
-    private final int col;
 
     public ChessPosition(int row, int col) {
-        this.row = row;
-        this.col = col;
     }
 
     /**
@@ -22,7 +18,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return row;
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -30,13 +26,7 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return col;
-
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%d,%d", row, col);
+        throw new RuntimeException("Not implemented");
     }
 
     @Override
