@@ -17,6 +17,18 @@ public class ChessBoard {
 
     }
 
+    public static boolean checkEnemyPresence(ChessBoard board, ChessPosition currentPosition, ChessPosition myPosition) {
+        ChessPiece occupant = board.getPiece(currentPosition);
+        ChessPiece myPiece = board.getPiece(myPosition);
+        return occupant != null && occupant.getTeamColor() != myPiece.getTeamColor();
+    }
+
+    public static boolean checkFriendlyPresence(ChessBoard board, ChessPosition currentPosition, ChessPosition myPosition) {
+        ChessPiece occupant = board.getPiece(currentPosition);
+        ChessPiece myPiece = board.getPiece(myPosition);
+        return occupant != null && occupant.getTeamColor() == myPiece.getTeamColor();
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
