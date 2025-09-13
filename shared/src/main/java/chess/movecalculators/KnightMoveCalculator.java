@@ -2,7 +2,6 @@ package chess.movecalculators;
 
 import chess.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class KnightMoveCalculator {
