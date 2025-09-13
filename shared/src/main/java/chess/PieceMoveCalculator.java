@@ -11,7 +11,7 @@ public abstract class PieceMoveCalculator {
         var possibleMoves = new ArrayList<ChessMove>();
 
         if (myPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
-            return possibleMoves;
+            return PawnMoveCalculator.pieceMoves(board, myPosition);
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.BISHOP) {
             return BishopMoveCalculator.pieceMoves(board, myPosition);
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
