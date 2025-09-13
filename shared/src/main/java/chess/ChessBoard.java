@@ -55,7 +55,45 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        // add all the white pieces
+        ChessGame.TeamColor white = ChessGame.TeamColor.WHITE;
+        ChessPiece rook = new ChessPiece(white, ChessPiece.PieceType.ROOK);
+        ChessPiece knight = new ChessPiece(white, ChessPiece.PieceType.KNIGHT);
+        ChessPiece bishop = new ChessPiece(white, ChessPiece.PieceType.BISHOP);
+        ChessPiece pawn = new ChessPiece(white, ChessPiece.PieceType.PAWN);
+
+        addPiece(new ChessPosition(1, 1), rook);
+        addPiece(new ChessPosition(1, 2), knight);
+        addPiece(new ChessPosition(1, 3), bishop);
+        addPiece(new ChessPosition(1, 4), new ChessPiece(white, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(1, 5), new ChessPiece(white, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(1, 6), bishop);
+        addPiece(new ChessPosition(1, 7), knight);
+        addPiece(new ChessPosition(1, 8), rook);
+
+        for (int i = 1; i < 9; i++) {
+            addPiece(new ChessPosition(2, i), pawn);
+        }
+
+        // add all the black pieces
+        ChessGame.TeamColor black = ChessGame.TeamColor.BLACK;
+        rook = new ChessPiece(black, ChessPiece.PieceType.ROOK);
+        knight = new ChessPiece(black, ChessPiece.PieceType.KNIGHT);
+        bishop = new ChessPiece(black, ChessPiece.PieceType.BISHOP);
+        pawn = new ChessPiece(black, ChessPiece.PieceType.PAWN);
+
+        addPiece(new ChessPosition(8, 1), rook);
+        addPiece(new ChessPosition(8, 2), knight);
+        addPiece(new ChessPosition(8, 3), bishop);
+        addPiece(new ChessPosition(8, 4), new ChessPiece(black, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(8, 5), new ChessPiece(black, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(8, 6), bishop);
+        addPiece(new ChessPosition(8, 7), knight);
+        addPiece(new ChessPosition(8, 8), rook);
+
+        for (int i = 1; i < 9; i++) {
+            addPiece(new ChessPosition(7, i), pawn);
+        }
     }
 
     @Override
@@ -73,6 +111,12 @@ public class ChessBoard {
 
     @Override
     public int hashCode() {
-        return Objects.hash((Object) board);
+        int hash = 0;
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                hash += Objects.hash(board[i][j]);
+            }
+        }
+        return hash;
     }
 }
