@@ -57,6 +57,9 @@ public class ChessPiece {
     }
 
     @Override
+    /**
+     * @returns "type:color"
+     */
     public String toString() {
         return String.format("%s:%s", type.toString(), pieceColor.toString());
     }

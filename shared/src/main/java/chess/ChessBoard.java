@@ -17,12 +17,28 @@ public class ChessBoard {
 
     }
 
+    /**
+     * Checks if a square is occupied by an enemy piece
+     *
+     * @param board           current ChessBoard
+     * @param currentPosition position to check for enemy piece
+     * @param myPosition      position of your piece
+     * @return true if enemy piece present, false otherwise
+     */
     public static boolean checkEnemyPresence(ChessBoard board, ChessPosition currentPosition, ChessPosition myPosition) {
         ChessPiece occupant = board.getPiece(currentPosition);
         ChessPiece myPiece = board.getPiece(myPosition);
         return occupant != null && occupant.getTeamColor() != myPiece.getTeamColor();
     }
 
+    /**
+     * Checks if a square is occupied by a friendly piece
+     *
+     * @param board           current ChessBoard
+     * @param currentPosition position to check for friendly piece
+     * @param myPosition      position of your piece
+     * @return true if friendly piece present, false otherwise
+     */
     public static boolean checkFriendlyPresence(ChessBoard board, ChessPosition currentPosition, ChessPosition myPosition) {
         ChessPiece occupant = board.getPiece(currentPosition);
         ChessPiece myPiece = board.getPiece(myPosition);

@@ -46,6 +46,9 @@ public class ChessMove {
     }
 
     @Override
+    /**
+     * @returns "[startPosition=>endPosition]"
+     */
     public String toString() {
         return String.format("[%s=>%s]", startPosition.toString(), endPosition.toString());
     }

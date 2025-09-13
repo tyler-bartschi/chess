@@ -5,7 +5,18 @@ import chess.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Class with algorithms for calculating potential chess moves given an int[][] of steps
+ */
 public class ChessMoveUtils {
+    /**
+     * Calculates ChessMoves for pieces that can only move one square (Knight, King)
+     *
+     * @param board      current ChessBoard
+     * @param myPosition current piece position
+     * @param steps      int[][] containing the mathematical rules for determining a piece's moveset
+     * @return Collection of ChessMoves representing all possible moves
+     */
     public static Collection<ChessMove> singleMoveCheck(ChessBoard board, ChessPosition myPosition, final int[][] steps) {
         var possibleMoves = new ArrayList<ChessMove>();
 
@@ -24,6 +35,14 @@ public class ChessMoveUtils {
         return possibleMoves;
     }
 
+    /**
+     * Calculates ChessMoves for pieces that can move multiple squares (Queen, Rook, Bishop)
+     *
+     * @param board      current ChessBoard
+     * @param myPosition current piece position
+     * @param steps      int[][] containing the mathematical rules for determining a piece's moveset
+     * @return Collection of ChessMoves representing all possible moves
+     */
     public static Collection<ChessMove> multiMoveCheck(ChessBoard board, ChessPosition myPosition, final int[][] steps) {
         var possibleMoves = new ArrayList<ChessMove>();
         for (int[] step : steps) {
