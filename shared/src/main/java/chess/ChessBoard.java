@@ -67,49 +67,38 @@ public class ChessBoard {
     }
 
     /**
+     * Adds all the chess pieces of a given color to the board
+     *
+     * @param color team color
+     */
+    private void addAllPieces(ChessGame.TeamColor color) {
+        ChessPiece rook = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+        ChessPiece knight = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+        ChessPiece bishop = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+        ChessPiece pawn = new ChessPiece(color, ChessPiece.PieceType.PAWN);
+        ChessPiece queen = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+        ChessPiece king = new ChessPiece(color, ChessPiece.PieceType.KING);
+
+        ChessPiece[] pieces = {rook, knight, bishop, queen, king, bishop, knight, rook};
+
+        int row = color == ChessGame.TeamColor.WHITE ? 1 : 8;
+        for (int i = 0; i < pieces.length; i++) {
+            addPiece(new ChessPosition(row, i + 1), pieces[i]);
+        }
+
+        int pawnRow = color == ChessGame.TeamColor.WHITE ? 2 : 7;
+        for (int i = 1; i < 9; i++) {
+            addPiece(new ChessPosition(pawnRow, i), pawn);
+        }
+    }
+
+    /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        // add all the white pieces
-        ChessGame.TeamColor white = ChessGame.TeamColor.WHITE;
-        ChessPiece rook = new ChessPiece(white, ChessPiece.PieceType.ROOK);
-        ChessPiece knight = new ChessPiece(white, ChessPiece.PieceType.KNIGHT);
-        ChessPiece bishop = new ChessPiece(white, ChessPiece.PieceType.BISHOP);
-        ChessPiece pawn = new ChessPiece(white, ChessPiece.PieceType.PAWN);
-
-        addPiece(new ChessPosition(1, 1), rook);
-        addPiece(new ChessPosition(1, 2), knight);
-        addPiece(new ChessPosition(1, 3), bishop);
-        addPiece(new ChessPosition(1, 4), new ChessPiece(white, ChessPiece.PieceType.QUEEN));
-        addPiece(new ChessPosition(1, 5), new ChessPiece(white, ChessPiece.PieceType.KING));
-        addPiece(new ChessPosition(1, 6), bishop);
-        addPiece(new ChessPosition(1, 7), knight);
-        addPiece(new ChessPosition(1, 8), rook);
-
-        for (int i = 1; i < 9; i++) {
-            addPiece(new ChessPosition(2, i), pawn);
-        }
-
-        // add all the black pieces
-        ChessGame.TeamColor black = ChessGame.TeamColor.BLACK;
-        rook = new ChessPiece(black, ChessPiece.PieceType.ROOK);
-        knight = new ChessPiece(black, ChessPiece.PieceType.KNIGHT);
-        bishop = new ChessPiece(black, ChessPiece.PieceType.BISHOP);
-        pawn = new ChessPiece(black, ChessPiece.PieceType.PAWN);
-
-        addPiece(new ChessPosition(8, 1), rook);
-        addPiece(new ChessPosition(8, 2), knight);
-        addPiece(new ChessPosition(8, 3), bishop);
-        addPiece(new ChessPosition(8, 4), new ChessPiece(black, ChessPiece.PieceType.QUEEN));
-        addPiece(new ChessPosition(8, 5), new ChessPiece(black, ChessPiece.PieceType.KING));
-        addPiece(new ChessPosition(8, 6), bishop);
-        addPiece(new ChessPosition(8, 7), knight);
-        addPiece(new ChessPosition(8, 8), rook);
-
-        for (int i = 1; i < 9; i++) {
-            addPiece(new ChessPosition(7, i), pawn);
-        }
+        addAllPieces(ChessGame.TeamColor.WHITE);
+        addAllPieces(ChessGame.TeamColor.BLACK);
     }
 
     @Override
