@@ -1,5 +1,7 @@
 package chess;
 
+import chess.movecalculators.*;
+
 import java.util.Collection;
 import java.util.ArrayList;
 
@@ -11,7 +13,7 @@ public abstract class PieceMoveCalculator {
         if (myPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
             return possibleMoves;
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-            return possibleMoves;
+            return BishopMoveCalculator.pieceMoves(board, myPosition);
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.ROOK) {
             return possibleMoves;
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.KNIGHT) {

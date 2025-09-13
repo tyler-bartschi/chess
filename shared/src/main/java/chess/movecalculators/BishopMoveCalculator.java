@@ -11,15 +11,15 @@ public class BishopMoveCalculator {
         final int[][] steps = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
         for (int i = 0; i < steps.length; i++) {
-            int row = myPosition.getRow();
-            int col = myPosition.getColumn();
             int rowAdder = steps[i][0];
             int colAdder = steps[i][1];
+            int row = myPosition.getRow() + rowAdder;
+            int col = myPosition.getColumn() + colAdder;
 
-            while (row < 8 && col < 8) {
+            while (row <= 8 && col <= 8 && row > 0 && col > 0) {
+                possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
                 row += rowAdder;
                 col += colAdder;
-                possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
             }
         }
 
