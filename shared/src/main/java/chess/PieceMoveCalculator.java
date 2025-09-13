@@ -21,7 +21,7 @@ public abstract class PieceMoveCalculator {
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.QUEEN) {
             return possibleMoves;
         } else if (myPiece.getPieceType() == ChessPiece.PieceType.KING) {
-            return possibleMoves;
+            return KingMoveCalculator.pieceMoves(board, myPosition);
         } else {
             return possibleMoves;
         }
