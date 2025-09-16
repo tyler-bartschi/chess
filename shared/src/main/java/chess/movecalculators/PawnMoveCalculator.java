@@ -75,6 +75,22 @@ public class PawnMoveCalculator {
     }
 
     /**
+     * Implements the logic of if a promotion is possible, add the promotion moves
+     *
+     * @param promotionFlag   whether the pawn is in a position to promote
+     * @param myPosition      the position of the pawn
+     * @param currentPosition the position the pawn is able to move to
+     * @param possibleMoves   the ArrayList of possible ChessMoves
+     */
+    private static void determinePromotion(boolean promotionFlag, ChessPosition myPosition, ChessPosition currentPosition, ArrayList<ChessMove> possibleMoves) {
+        if (promotionFlag) {
+            addPromotionMoves(myPosition, currentPosition, possibleMoves);
+        } else {
+            possibleMoves.add(new ChessMove(myPosition, currentPosition, null));
+        }
+    }
+
+    /**
      * Calculates all potential moves a pawn can take
      *
      * @param board      current board
@@ -98,29 +114,20 @@ public class PawnMoveCalculator {
                 continue;
             }
 
+            boolean promotionFlag = row == 8 || row == 1;
+            var currentPosition = new ChessPosition(row, col);
+
             if (i == 0) {
-                if (ChessBoard.checkFriendlyPresence(board, new ChessPosition(row, col), myPosition) || ChessBoard.checkEnemyPresence(board, new ChessPosition(row, col), myPosition)) {
-                    continue;
-                } else {
-                    if (row == 8 || row == 1) {
-                        addPromotionMoves(myPosition, new ChessPosition(row, col), possibleMoves);
-                    } else {
-                        possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-                    }
+                if (!ChessBoard.checkFriendlyPresence(board, currentPosition, myPosition) && !ChessBoard.checkEnemyPresence(board, currentPosition, myPosition)) {
+                    determinePromotion(promotionFlag, myPosition, currentPosition, possibleMoves);
                 }
             } else if (i == 1) {
-                if (Arrays.equals(step, invalidStep) || checkPawnPositions(board, new ChessPosition(row, col), myPosition, myColor)) {
-                    continue;
-                } else {
-                    possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+                if (!Arrays.equals(step, invalidStep) && !checkPawnPositions(board, currentPosition, myPosition, myColor)) {
+                    possibleMoves.add(new ChessMove(myPosition, currentPosition, null));
                 }
             } else {
-                if (ChessBoard.checkEnemyPresence(board, new ChessPosition(row, col), myPosition)) {
-                    if (row == 8 || row == 1) {
-                        addPromotionMoves(myPosition, new ChessPosition(row, col), possibleMoves);
-                    } else {
-                        possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-                    }
+                if (ChessBoard.checkEnemyPresence(board, currentPosition, myPosition)) {
+                    determinePromotion(promotionFlag, myPosition, currentPosition, possibleMoves);
                 }
             }
         }
