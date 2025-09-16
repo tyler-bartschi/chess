@@ -48,7 +48,8 @@ public class PawnMoveCalculator {
      * @param myColor         color of pawn
      * @return true if it cannot move two squares, false if it can
      */
-    private static boolean checkPawnPositions(ChessBoard board, ChessPosition currentPosition, ChessPosition myPosition, ChessGame.TeamColor myColor) {
+    private static boolean checkPawnPositions(ChessBoard board, ChessPosition currentPosition,
+                                              ChessPosition myPosition, ChessGame.TeamColor myColor) {
         ChessPosition lowerPosition;
         if (myColor == ChessGame.TeamColor.WHITE) {
             lowerPosition = new ChessPosition(currentPosition.getRow() - 1, currentPosition.getColumn());
@@ -56,8 +57,10 @@ public class PawnMoveCalculator {
             lowerPosition = new ChessPosition(currentPosition.getRow() + 1, currentPosition.getColumn());
 
         }
-        return ChessBoard.checkFriendlyPresence(board, currentPosition, myPosition) || ChessBoard.checkFriendlyPresence(board, lowerPosition, myPosition)
-                || ChessBoard.checkEnemyPresence(board, currentPosition, myPosition) || ChessBoard.checkEnemyPresence(board, lowerPosition, myPosition);
+        return ChessBoard.checkFriendlyPresence(board, currentPosition, myPosition)
+                || ChessBoard.checkFriendlyPresence(board, lowerPosition, myPosition)
+                || ChessBoard.checkEnemyPresence(board, currentPosition, myPosition)
+                || ChessBoard.checkEnemyPresence(board, lowerPosition, myPosition);
     }
 
     /**
@@ -82,7 +85,8 @@ public class PawnMoveCalculator {
      * @param currentPosition the position the pawn is able to move to
      * @param possibleMoves   the ArrayList of possible ChessMoves
      */
-    private static void determinePromotion(boolean promotionFlag, ChessPosition myPosition, ChessPosition currentPosition, ArrayList<ChessMove> possibleMoves) {
+    private static void determinePromotion(boolean promotionFlag, ChessPosition myPosition,
+                                           ChessPosition currentPosition, ArrayList<ChessMove> possibleMoves) {
         if (promotionFlag) {
             addPromotionMoves(myPosition, currentPosition, possibleMoves);
         } else {
@@ -118,7 +122,8 @@ public class PawnMoveCalculator {
             var currentPosition = new ChessPosition(row, col);
 
             if (i == 0) {
-                if (!ChessBoard.checkFriendlyPresence(board, currentPosition, myPosition) && !ChessBoard.checkEnemyPresence(board, currentPosition, myPosition)) {
+                if (!ChessBoard.checkFriendlyPresence(board, currentPosition, myPosition)
+                        && !ChessBoard.checkEnemyPresence(board, currentPosition, myPosition)) {
                     determinePromotion(promotionFlag, myPosition, currentPosition, possibleMoves);
                 }
             } else if (i == 1) {
