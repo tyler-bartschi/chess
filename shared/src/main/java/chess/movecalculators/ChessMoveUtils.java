@@ -27,8 +27,9 @@ public class ChessMoveUtils {
             int col = myPosition.getColumn() + colAdder;
 
             if (row > 0 && row <= 8 && col > 0 && col <= 8) {
-                if (!ChessBoard.checkFriendlyPresence(board, new ChessPosition(row, col), myPosition)) {
-                    possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+                var currentPosition = new ChessPosition(row, col);
+                if (!ChessBoard.checkFriendlyPresence(board, currentPosition, myPosition)) {
+                    possibleMoves.add(new ChessMove(myPosition, currentPosition, null));
                 }
             }
         }
@@ -52,11 +53,13 @@ public class ChessMoveUtils {
             int col = myPosition.getColumn() + colAdder;
 
             while (row <= 8 && col <= 8 && row > 0 && col > 0) {
-                if (ChessBoard.checkFriendlyPresence(board, new ChessPosition(row, col), myPosition)) {
+                var currentPosition = new ChessPosition(row, col);
+
+                if (ChessBoard.checkFriendlyPresence(board, currentPosition, myPosition)) {
                     break;
                 }
-                possibleMoves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-                if (ChessBoard.checkEnemyPresence(board, new ChessPosition(row, col), myPosition)) {
+                possibleMoves.add(new ChessMove(myPosition, currentPosition, null));
+                if (ChessBoard.checkEnemyPresence(board, currentPosition, myPosition)) {
                     break;
                 }
                 row += rowAdder;
