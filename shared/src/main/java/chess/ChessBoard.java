@@ -1,5 +1,8 @@
 package chess;
 
+import chess.movemanagers.MoveManager;
+import chess.movemanagers.MovementRule;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -12,37 +15,64 @@ import java.util.Objects;
 public class ChessBoard {
 
     private ChessPiece[][] board = new ChessPiece[8][8];
+    private final MoveManager moveManager;
 
     public ChessBoard() {
-
+        moveManager = new MoveManager();
     }
 
     /**
-     * Checks if a square is occupied by an enemy piece
+     * Adds all pieces of a single color to the board
      *
-     * @param board           current ChessBoard
-     * @param currentPosition position to check for enemy piece
-     * @param myPosition      position of your piece
-     * @return true if enemy piece present, false otherwise
+     * @param color Team Color
      */
-    public static boolean checkEnemyPresence(ChessBoard board, ChessPosition currentPosition, ChessPosition myPosition) {
-        ChessPiece occupant = board.getPiece(currentPosition);
-        ChessPiece myPiece = board.getPiece(myPosition);
-        return occupant != null && occupant.getTeamColor() != myPiece.getTeamColor();
+    private void addAllPieces(ChessGame.TeamColor color) {
+        ChessPiece[] pieces = {
+                new ChessPiece(color, ChessPiece.PieceType.ROOK),
+                new ChessPiece(color, ChessPiece.PieceType.KNIGHT),
+                new ChessPiece(color, ChessPiece.PieceType.BISHOP),
+                new ChessPiece(color, ChessPiece.PieceType.QUEEN),
+                new ChessPiece(color, ChessPiece.PieceType.KING),
+                new ChessPiece(color, ChessPiece.PieceType.BISHOP),
+                new ChessPiece(color, ChessPiece.PieceType.KNIGHT),
+                new ChessPiece(color, ChessPiece.PieceType.ROOK)
+        };
+
+        int row = color == ChessGame.TeamColor.WHITE ? 1 : 8;
+        int pawnRow = color == ChessGame.TeamColor.WHITE ? 2 : 7;
+
+        for (int i = 0; i < pieces.length; i++) {
+            addPiece(new ChessPosition(row, i + 1), pieces[i]);
+            addPiece(new ChessPosition(pawnRow, i + 1), new ChessPiece(color, ChessPiece.PieceType.PAWN));
+        }
+    }
+
+    public MovementRule getMoveManager() {
+        return moveManager;
     }
 
     /**
-     * Checks if a square is occupied by a friendly piece
+     * Checks if a position has a friendly piece on it
      *
-     * @param board           current ChessBoard
-     * @param currentPosition position to check for friendly piece
-     * @param myPosition      position of your piece
-     * @return true if friendly piece present, false otherwise
+     * @param position position to check
+     * @param color    color to verify against
+     * @return true if friendly present at position, false otherwise
      */
-    public static boolean checkFriendlyPresence(ChessBoard board, ChessPosition currentPosition, ChessPosition myPosition) {
-        ChessPiece occupant = board.getPiece(currentPosition);
-        ChessPiece myPiece = board.getPiece(myPosition);
-        return occupant != null && occupant.getTeamColor() == myPiece.getTeamColor();
+    public boolean checkFriendlyPosition(ChessPosition position, ChessGame.TeamColor color) {
+        ChessPiece potential = getPiece(position);
+        return potential != null && potential.getTeamColor() == color;
+    }
+
+    /**
+     * Checks if a position has an enemy piece on it
+     *
+     * @param position position to check
+     * @param color    color to verify against
+     * @return true if enemy present at position, false otherwise
+     */
+    public boolean checkEnemyPosition(ChessPosition position, ChessGame.TeamColor color) {
+        ChessPiece potential = getPiece(position);
+        return potential != null && potential.getTeamColor() != color;
     }
 
     /**
@@ -67,61 +97,38 @@ public class ChessBoard {
     }
 
     /**
-     * Adds all the chess pieces of a given color to the board
-     *
-     * @param color team color
-     */
-    private void addAllPieces(ChessGame.TeamColor color) {
-        ChessPiece rook = new ChessPiece(color, ChessPiece.PieceType.ROOK);
-        ChessPiece knight = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
-        ChessPiece bishop = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
-        ChessPiece pawn = new ChessPiece(color, ChessPiece.PieceType.PAWN);
-        ChessPiece queen = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
-        ChessPiece king = new ChessPiece(color, ChessPiece.PieceType.KING);
-
-        ChessPiece[] pieces = {rook, knight, bishop, queen, king, bishop, knight, rook};
-
-        int row = color == ChessGame.TeamColor.WHITE ? 1 : 8;
-        for (int i = 0; i < pieces.length; i++) {
-            addPiece(new ChessPosition(row, i + 1), pieces[i]);
-        }
-
-        int pawnRow = color == ChessGame.TeamColor.WHITE ? 2 : 7;
-        for (int i = 1; i < 9; i++) {
-            addPiece(new ChessPosition(pawnRow, i), pawn);
-        }
-    }
-
-    /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
+        board = new ChessPiece[8][8];
         addAllPieces(ChessGame.TeamColor.WHITE);
         addAllPieces(ChessGame.TeamColor.BLACK);
     }
 
     @Override
     public String toString() {
-        return "Not yet implemented.";
+        return "ChessBoard{" +
+                "board=" + Arrays.deepToString(board) +
+                '}';
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ChessBoard that)) {
-            return false;
+        if (o instanceof ChessBoard that) {
+            return Arrays.deepEquals(board, that.board);
         }
-        return Arrays.deepEquals(board, that.board);
+        return false;
     }
 
     @Override
     public int hashCode() {
-        int hash = 0;
+        int code = 0;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
-                hash += Objects.hash(board[i][j]);
+                code += Objects.hash(board[i][j]);
             }
         }
-        return hash;
+        return code;
     }
 }

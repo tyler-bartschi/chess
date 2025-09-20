@@ -35,24 +35,20 @@ public class ChessPosition {
     }
 
     @Override
-    /**
-     * @returns "row, col"
-     */
     public String toString() {
         return String.format("%d,%d", row, col);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ChessPosition that)) {
-            return false;
+        if (o instanceof ChessPosition that) {
+            return row == that.row && col == that.col;
         }
-        return row == that.row && col == that.col;
+        return false;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(row, col);
     }
-
 }

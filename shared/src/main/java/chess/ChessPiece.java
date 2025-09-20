@@ -12,9 +12,9 @@ import java.util.Objects;
 public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
-    private final ChessPiece.PieceType type;
+    private final PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
     }
@@ -53,23 +53,20 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return PieceMoveCalculator.pieceMoves(board, myPosition);
+        return board.getMoveManager().pieceMoves(board, myPosition);
     }
 
     @Override
-    /**
-     * @returns "type:color"
-     */
     public String toString() {
         return String.format("%s:%s", type.toString(), pieceColor.toString());
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ChessPiece that)) {
-            return false;
+        if (o instanceof ChessPiece that) {
+            return pieceColor == that.pieceColor && type == that.type;
         }
-        return pieceColor == that.pieceColor && type == that.type;
+        return false;
     }
 
     @Override

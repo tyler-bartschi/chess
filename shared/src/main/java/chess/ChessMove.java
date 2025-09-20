@@ -46,19 +46,16 @@ public class ChessMove {
     }
 
     @Override
-    /**
-     * @returns "[startPosition=>endPosition]"
-     */
     public String toString() {
         return String.format("[%s=>%s]", startPosition.toString(), endPosition.toString());
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof ChessMove that)) {
-            return false;
+        if (o instanceof ChessMove that) {
+            return startPosition.equals(that.startPosition) && endPosition.equals(that.endPosition) && promotionPiece == that.promotionPiece;
         }
-        return startPosition.equals(that.startPosition) && endPosition.equals(that.endPosition) && promotionPiece == that.promotionPiece;
+        return false;
     }
 
     @Override
