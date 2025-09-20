@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class PawnMovement implements MovementRule {
-    private final int[] INVALID_STEP = {0, 0};
+    private final int[] invalidStep = {0, 0};
 
     public PawnMovement() {
 
@@ -81,7 +81,7 @@ public class PawnMovement implements MovementRule {
             var currentPosition = new ChessPosition(row, col);
 
 
-            if (Arrays.equals(step, INVALID_STEP) || !checkBounds(row, col) || board.checkFriendlyPosition(currentPosition, myColor)) {
+            if (Arrays.equals(step, invalidStep) || !checkBounds(row, col) || board.checkFriendlyPosition(currentPosition, myColor)) {
                 continue;
             }
 
