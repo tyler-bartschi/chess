@@ -66,3 +66,13 @@ Special values include Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, and D
 - records are an object that represent a data object without you having to program the whole object.
 - `record PetRecord(int id, String name, String type) {}` creates a record object, that is immutable, with automatic getters, equals, hashcode, and toString methods
 - If needed, can also provide your own methods to the record in the {}
+
+### Exceptions
+
+- Try, catch, throw. Function signatures must have a `throws ExceptionType` if it or any of the functions it calls throws and exception. Can also use a finally block, which will execute in any event, including an exception. If the try block does not include a catch but does include a finally will run and then the exception continues up the stack.
+- If a class implements the closable interface, it can use the `try-with-resources` syntax, where the Object is declared as a parameeter to the try keyword. This will automatically close the resource and help prevent links.
+
+### Collections
+
+- if I want to use my objects within a class that sorts them, I must implement the Comparable interface, which returns a negative integer if the object is less, zero if they are equal, and a positive integer if the object is greater than the object provided as a parameter to `compareTo`.
+- 
