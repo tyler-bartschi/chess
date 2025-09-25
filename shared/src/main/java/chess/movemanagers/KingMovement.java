@@ -16,6 +16,6 @@ public class KingMovement extends BaseMovementRule {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return pieceMoves(board, myPosition, steps, recursive);
+        return calculateMoves(board, myPosition, steps, recursive);
     }
 }

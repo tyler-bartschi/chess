@@ -30,7 +30,7 @@ public abstract class BaseMovementRule implements MovementRule {
      * @param recursive  boolean of whether the movement is recursive
      * @return Collection of ChessMoves dictating the possible moveset of the piece
      */
-    private Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition myPosition, final int[][] steps, final boolean recursive) {
+    protected Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition myPosition, final int[][] steps, final boolean recursive) {
         var possibleMoves = new ArrayList<ChessMove>();
 
         for (int[] step : steps) {
@@ -67,19 +67,6 @@ public abstract class BaseMovementRule implements MovementRule {
         }
 
         return possibleMoves;
-    }
-
-    /**
-     * Generates the potential moves a piece can take, given all necessary information
-     *
-     * @param board      current board
-     * @param myPosition current piece position
-     * @param steps      int[][] of steps the piece could take in any direction
-     * @param recursive  boolean of whether the movement is recursive
-     * @return Collection of ChessMoves that a given piece could take
-     */
-    protected Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, final int[][] steps, final boolean recursive) {
-        return calculateMoves(board, myPosition, steps, recursive);
     }
 
     @Override
