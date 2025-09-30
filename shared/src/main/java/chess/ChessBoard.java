@@ -106,6 +106,24 @@ public class ChessBoard {
         addAllPieces(ChessGame.TeamColor.BLACK);
     }
 
+    /**
+     * Sets a chessboard to match a given board
+     *
+     * @param givenBoard board to match
+     */
+    public void setGivenBoard(ChessBoard givenBoard) {
+        this.board = givenBoard.board;
+    }
+
+    /**
+     * Returns a string for use with the ChessGame object
+     *
+     * @return string representation of the board
+     */
+    public String gameToString() {
+        return Arrays.deepToString(board);
+    }
+
     @Override
     public String toString() {
         return "ChessBoard{" +
