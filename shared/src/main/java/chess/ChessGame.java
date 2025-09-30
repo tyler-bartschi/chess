@@ -13,11 +13,32 @@ public class ChessGame {
 
     private ChessBoard chessboard;
     private TeamColor teamTurn;
+    private ValidMoveFilter moveFilter;
 
     public ChessGame() {
         chessboard = new ChessBoard();
         chessboard.resetBoard();
         teamTurn = TeamColor.WHITE;
+        moveFilter = new ValidMoveFilter();
+    }
+
+    private ChessPosition findKing(ChessBoard board, TeamColor myColor) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition currentPosition = new ChessPosition(i, j);
+                ChessPiece currentPiece = board.getPiece(currentPosition);
+                if (currentPiece.getPieceType() == ChessPiece.PieceType.KING && currentPiece.getTeamColor() == myColor) {
+                    return currentPosition;
+                }
+            }
+        }
+        return null;
+    }
+
+    private ChessBoard makeMoveForceful(ChessBoard board, ChessMove move) {
+        ChessBoard newBoard = new ChessBoard();
+        newBoard.setGivenBoard(chessboard);
+
     }
 
     /**
@@ -52,7 +73,17 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece myPiece = chessboard.getPiece(startPosition);
+        if (myPiece == null) {
+            return null;
+        }
+
+        Collection<ChessMove> possibleMoves = myPiece.pieceMoves(chessboard, startPosition);
+
+        for (ChessMove currentMove : possibleMoves) {
+
+        }
+
     }
 
     /**
@@ -72,7 +103,12 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = findKing(chessboard, teamColor);
+        if (kingPosition == null) {
+            throw new RuntimeException("Could not find King.");
+        }
+
+        return moveFilter.checkIfInCheck(chessboard, kingPosition, teamColor);
     }
 
     /**
