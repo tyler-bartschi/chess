@@ -19,7 +19,7 @@ public class ValidMoveFilter {
             for (int j = 1; j < 9; j++) {
                 ChessPosition currentPosition = new ChessPosition(i, j);
                 ChessPiece currentPiece = board.getPiece(currentPosition);
-                if (currentPiece.getTeamColor() == kingColor) {
+                if (currentPiece == null || currentPiece.getTeamColor() == kingColor) {
                     continue;
                 }
                 Collection<ChessMove> currentMoves = currentPiece.pieceMoves(board, currentPosition);

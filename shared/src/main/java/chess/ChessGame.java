@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.ArrayList;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -27,6 +28,9 @@ public class ChessGame {
             for (int j = 1; j < 9; j++) {
                 ChessPosition currentPosition = new ChessPosition(i, j);
                 ChessPiece currentPiece = board.getPiece(currentPosition);
+                if (currentPiece == null) {
+                    continue;
+                }
                 if (currentPiece.getPieceType() == ChessPiece.PieceType.KING && currentPiece.getTeamColor() == myColor) {
                     return currentPosition;
                 }
@@ -35,10 +39,11 @@ public class ChessGame {
         return null;
     }
 
-    private ChessBoard makeMoveForceful(ChessBoard board, ChessMove move) {
+    private ChessBoard makeMoveForceful(ChessMove move) {
         ChessBoard newBoard = new ChessBoard();
         newBoard.setGivenBoard(chessboard);
-
+        newBoard.makeMove(move);
+        return newBoard;
     }
 
     /**
@@ -77,13 +82,19 @@ public class ChessGame {
         if (myPiece == null) {
             return null;
         }
+        TeamColor myColor = myPiece.getTeamColor();
 
         Collection<ChessMove> possibleMoves = myPiece.pieceMoves(chessboard, startPosition);
+        ArrayList<ChessMove> validMoves = new ArrayList<ChessMove>();
 
         for (ChessMove currentMove : possibleMoves) {
-
+            ChessBoard tempBoard = makeMoveForceful(currentMove);
+            ChessPosition kingPosition = findKing(tempBoard, myColor);
+            if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor)) {
+                validMoves.add(currentMove);
+            }
         }
-
+        return validMoves;
     }
 
     /**

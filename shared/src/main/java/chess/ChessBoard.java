@@ -121,7 +121,18 @@ public class ChessBoard {
      * @param givenBoard board to match
      */
     public void setGivenBoard(ChessBoard givenBoard) {
-        this.board = givenBoard.board;
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition currentPosition = new ChessPosition(i, j);
+                ChessPiece currentPiece = givenBoard.getPiece(currentPosition);
+                if (currentPiece == null) {
+                    addPiece(currentPosition, null);
+                } else {
+                    ChessPiece newPiece = new ChessPiece(currentPiece.getTeamColor(), currentPiece.getPieceType());
+                    addPiece(currentPosition, newPiece);
+                }
+            }
+        }
     }
 
     /**
