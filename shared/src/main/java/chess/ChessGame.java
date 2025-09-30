@@ -23,6 +23,13 @@ public class ChessGame {
         moveFilter = new ValidMoveFilter();
     }
 
+    /**
+     * Finds the king of the given color on a given board
+     *
+     * @param board   current board
+     * @param myColor color of the king to find
+     * @return the ChessPosition containing the king, null if it cannot be found
+     */
     private ChessPosition findKing(ChessBoard board, TeamColor myColor) {
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
@@ -39,6 +46,41 @@ public class ChessGame {
         return null;
     }
 
+    /**
+     * Returns true if there is a possible move to protect the king
+     *
+     * @param myColor King's color
+     * @return true if there is a move to protect the king, false otherwise
+     */
+    private boolean checkKingProtection(TeamColor myColor) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition currentPosition = new ChessPosition(i, j);
+                ChessPiece currentPiece = chessboard.getPiece(currentPosition);
+                if (currentPiece == null || currentPiece.getTeamColor() != myColor || currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    continue;
+                }
+
+                Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(chessboard, currentPosition);
+
+                for (ChessMove move : possibleMoves) {
+                    ChessBoard tempBoard = makeMoveForceful(move);
+                    ChessPosition kingPosition = findKing(tempBoard, myColor);
+                    if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Make a new ChessBoard with a new move made, no checks are made for if the move is valid.
+     *
+     * @param move ChessMove to make
+     * @return ChessBoard with the given move made
+     */
     private ChessBoard makeMoveForceful(ChessMove move) {
         ChessBoard newBoard = new ChessBoard();
         newBoard.setGivenBoard(chessboard);
@@ -147,7 +189,9 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = findKing(chessboard, teamColor);
+        Collection<ChessMove> kingMoves = validMoves(kingPosition);
+        return isInCheck(teamColor) && kingMoves.isEmpty() && !checkKingProtection(teamColor);
     }
 
     /**
@@ -158,7 +202,25 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = findKing(chessboard, teamColor);
+        Collection<ChessMove> kingMoves = validMoves(kingPosition);
+
+        // find all the valid moves
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition currentPosition = new ChessPosition(i, j);
+                ChessPiece currentPiece = chessboard.getPiece(currentPosition);
+                if (currentPiece == null || currentPiece.getTeamColor() != teamColor) {
+                    continue;
+                }
+                Collection<ChessMove> valid = validMoves(currentPosition);
+                if (!valid.isEmpty()) {
+                    return false;
+                }
+            }
+        }
+
+        return !isInCheck(teamColor);
     }
 
     /**
