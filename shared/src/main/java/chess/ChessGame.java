@@ -12,9 +12,9 @@ import java.util.ArrayList;
  */
 public class ChessGame {
 
-    private ChessBoard chessboard;
+    private final ChessBoard chessboard;
     private TeamColor teamTurn;
-    private ValidMoveFilter moveFilter;
+    private final ValidMoveFilter moveFilter;
 
     public ChessGame() {
         chessboard = new ChessBoard();
@@ -202,9 +202,6 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        ChessPosition kingPosition = findKing(chessboard, teamColor);
-        Collection<ChessMove> kingMoves = validMoves(kingPosition);
-
         // find all the valid moves
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
