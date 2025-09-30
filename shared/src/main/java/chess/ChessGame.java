@@ -85,16 +85,16 @@ public class ChessGame {
         TeamColor myColor = myPiece.getTeamColor();
 
         Collection<ChessMove> possibleMoves = myPiece.pieceMoves(chessboard, startPosition);
-        ArrayList<ChessMove> validMoves = new ArrayList<ChessMove>();
+        ArrayList<ChessMove> valid = new ArrayList<ChessMove>();
 
         for (ChessMove currentMove : possibleMoves) {
             ChessBoard tempBoard = makeMoveForceful(currentMove);
             ChessPosition kingPosition = findKing(tempBoard, myColor);
             if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor)) {
-                validMoves.add(currentMove);
+                valid.add(currentMove);
             }
         }
-        return validMoves;
+        return valid;
     }
 
     /**
@@ -104,7 +104,25 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        if (chessboard.getPiece(move.getStartPosition()) == null) {
+            throw new InvalidMoveException("No piece to move at " + move.getStartPosition());
+        }
+
+        if (chessboard.getPiece(move.getStartPosition()).getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("Move out of turn. Current turn is: " + teamTurn);
+        }
+
+        Collection<ChessMove> valid = validMoves(move.getStartPosition());
+        if (valid == null) {
+            throw new InvalidMoveException("No moves are valid for given piece.");
+        }
+
+        if (valid.contains(move)) {
+            chessboard.makeMove(move);
+            setTeamTurn(teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
+        } else {
+            throw new InvalidMoveException("Invalid move provided: " + move);
+        }
     }
 
     /**
