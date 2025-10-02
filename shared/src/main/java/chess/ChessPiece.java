@@ -58,12 +58,20 @@ public class ChessPiece {
         return board.getMoveManager().pieceMoves(board, myPosition);
     }
 
+    /**
+     * Sets the hasMoved variable to true if it was previously false
+     */
     public void setHasMoved() {
         if (!hasMoved) {
             hasMoved = true;
         }
     }
 
+    /**
+     * Returns the hasMoved variable
+     *
+     * @return hasMoved boolean
+     */
     public boolean getHasMoved() {
         return hasMoved;
     }
