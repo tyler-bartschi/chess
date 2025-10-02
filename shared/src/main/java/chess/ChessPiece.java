@@ -13,10 +13,12 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
+    private boolean hasMoved;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        hasMoved = false;
     }
 
     /**
@@ -54,6 +56,16 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return board.getMoveManager().pieceMoves(board, myPosition);
+    }
+
+    public void setHasMoved() {
+        if (!hasMoved) {
+            hasMoved = true;
+        }
+    }
+
+    public boolean getHasMoved() {
+        return hasMoved;
     }
 
     @Override

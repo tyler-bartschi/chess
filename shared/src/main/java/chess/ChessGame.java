@@ -57,7 +57,8 @@ public class ChessGame {
             for (int j = 1; j < 9; j++) {
                 ChessPosition currentPosition = new ChessPosition(i, j);
                 ChessPiece currentPiece = chessboard.getPiece(currentPosition);
-                if (currentPiece == null || currentPiece.getTeamColor() != myColor || currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                if (currentPiece == null || currentPiece.getTeamColor() != myColor
+                        || currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
                     continue;
                 }
 

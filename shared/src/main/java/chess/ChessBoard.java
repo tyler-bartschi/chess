@@ -103,6 +103,7 @@ public class ChessBoard {
         }
         addPiece(move.getEndPosition(), currentPiece);
         addPiece(move.getStartPosition(), null);
+        currentPiece.setHasMoved();
     }
 
     /**

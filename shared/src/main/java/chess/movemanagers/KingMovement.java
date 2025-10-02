@@ -1,8 +1,6 @@
 package chess.movemanagers;
 
-import chess.ChessBoard;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.Collection;
 
@@ -14,8 +12,54 @@ public class KingMovement extends BaseMovementRule {
 
     }
 
+    private boolean checkIsRook(ChessPiece piece) {
+        return piece != null && piece.getPieceType() == ChessPiece.PieceType.ROOK;
+    }
+
+    private boolean checkBetweenLeft(ChessBoard board, int row) {
+        for (int i = 4; i > 1; i--) {
+            if (board.getPiece(new ChessPosition(row, i)) != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkBetweenRight(ChessBoard board, int row) {
+        for (int i = 6; i < 8; i++) {
+            if (board.getPiece(new ChessPosition(row, i)) != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void checkCastling(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> possibleMoves) {
+        ChessPiece myPiece = board.getPiece(myPosition);
+        int startRow = myPiece.getTeamColor() == ChessGame.TeamColor.WHITE ? 1 : 8;
+        if (myPiece.getHasMoved() || myPosition.getRow() != startRow) {
+            return;
+        }
+
+        ChessPosition firstRookPosition = new ChessPosition(startRow, 1);
+        ChessPosition secondRookPosition = new ChessPosition(startRow, 8);
+        ChessPiece firstRook = board.getPiece(firstRookPosition);
+        ChessPiece secondRook = board.getPiece(secondRookPosition);
+
+        if (checkIsRook(firstRook) && !firstRook.getHasMoved() && checkBetweenLeft(board, startRow)) {
+            possibleMoves.add(new ChessMove(myPosition, new ChessPosition(startRow, 1), null));
+        }
+
+        if (checkIsRook(secondRook) && !secondRook.getHasMoved() && checkBetweenRight(board, startRow)) {
+            possibleMoves.add(new ChessMove(myPosition, new ChessPosition(startRow, 8), null));
+        }
+
+    }
+
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return calculateMoves(board, myPosition, steps, recursive);
+        Collection<ChessMove> possibleMoves = calculateMoves(board, myPosition, steps, recursive);
+        checkCastling(board, myPosition, possibleMoves);
+        return possibleMoves;
     }
 }
