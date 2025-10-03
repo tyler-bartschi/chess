@@ -16,11 +16,30 @@ public class ChessGame {
     private TeamColor teamTurn;
     private final ValidMoveFilter moveFilter;
 
+    private boolean enPassantPossible;
+    private ChessPosition doubleMovedPawn;
+
     public ChessGame() {
         chessboard = new ChessBoard();
         chessboard.resetBoard();
         teamTurn = TeamColor.WHITE;
         moveFilter = new ValidMoveFilter();
+        enPassantPossible = false;
+        doubleMovedPawn = null;
+    }
+
+    private boolean checkPawnMoveAndUpdate(ChessMove move) {
+        ChessPiece myPiece = chessboard.getPiece(move.getStartPosition());
+        if (myPiece.getPieceType() != ChessPiece.PieceType.PAWN) {
+            return false;
+        }
+
+        if (move.getStartPosition().getRow() + 2 == move.getEndPosition().getRow() || move.getStartPosition().getRow() - 2 == move.getEndPosition().getRow()) {
+            enPassantPossible = true;
+            doubleMovedPawn = move.getEndPosition();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -122,6 +141,10 @@ public class ChessGame {
         BLACK
     }
 
+    private boolean checkPawnPosition(ChessPosition pawnPosition) {
+        return (pawnPosition.getColumn() == doubleMovedPawn.getColumn() - 1 || pawnPosition.getColumn() == doubleMovedPawn.getColumn() + 1) && pawnPosition.getRow() == doubleMovedPawn.getRow();
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -159,6 +182,14 @@ public class ChessGame {
                 }
             }
         }
+
+        boolean pawnFlag = myPiece.getPieceType() == ChessPiece.PieceType.PAWN;
+        if (pawnFlag && enPassantPossible) {
+            if (checkPawnPosition(startPosition)) {
+                int newRow = doubleMovedPawn.getRow() == 4 ? 3 : 6;
+                valid.add(new ChessMove(startPosition, new ChessPosition(newRow, doubleMovedPawn.getColumn()), null));
+            }
+        }
         return valid;
     }
 
@@ -183,6 +214,10 @@ public class ChessGame {
         }
 
         if (valid.contains(move)) {
+            if (!checkPawnMoveAndUpdate(move)) {
+                enPassantPossible = false;
+                doubleMovedPawn = null;
+            }
             chessboard.makeMove(move);
             setTeamTurn(teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
         } else {

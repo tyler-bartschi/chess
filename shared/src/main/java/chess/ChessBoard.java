@@ -59,6 +59,10 @@ public class ChessBoard {
         return endColumn == startColumn + 2 || endColumn == startColumn - 2;
     }
 
+    private boolean pawnWantsEnPassant(ChessMove move) {
+        return getPiece(move.getEndPosition()) == null && move.getEndPosition().getRow() != 8 && move.getEndPosition().getRow() != 1;
+    }
+
     /**
      * Returns a reference to the moveManager
      *
@@ -126,6 +130,11 @@ public class ChessBoard {
 
             addPiece(move.getStartPosition(), null);
             addPiece(new ChessPosition(move.getStartPosition().getRow(), rookStartCol), null);
+        } else if (currentPiece.getPieceType() == ChessPiece.PieceType.PAWN && pawnWantsEnPassant(move)) {
+            addPiece(move.getEndPosition(), currentPiece);
+            int capturedRow = move.getEndPosition().getRow() == 3 ? 4 : 5;
+            addPiece(new ChessPosition(capturedRow, move.getEndPosition().getColumn()), null);
+            addPiece(move.getStartPosition(), null);
         } else {
             if (move.getPromotionPiece() != null) {
                 currentPiece = new ChessPiece(currentPiece.getTeamColor(), move.getPromotionPiece());
