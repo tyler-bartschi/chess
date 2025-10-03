@@ -28,95 +28,6 @@ public class ChessGame {
         doubleMovedPawn = null;
     }
 
-    private boolean checkPawnMoveAndUpdate(ChessMove move) {
-        ChessPiece myPiece = chessboard.getPiece(move.getStartPosition());
-        if (myPiece.getPieceType() != ChessPiece.PieceType.PAWN) {
-            return false;
-        }
-
-        if (move.getStartPosition().getRow() + 2 == move.getEndPosition().getRow() || move.getStartPosition().getRow() - 2 == move.getEndPosition().getRow()) {
-            enPassantPossible = true;
-            doubleMovedPawn = move.getEndPosition();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Finds the king of the given color on a given board
-     *
-     * @param board   current board
-     * @param myColor color of the king to find
-     * @return the ChessPosition containing the king, null if it cannot be found
-     */
-    private ChessPosition findKing(ChessBoard board, TeamColor myColor) {
-        for (int i = 1; i < 9; i++) {
-            for (int j = 1; j < 9; j++) {
-                ChessPosition currentPosition = new ChessPosition(i, j);
-                ChessPiece currentPiece = board.getPiece(currentPosition);
-                if (currentPiece == null) {
-                    continue;
-                }
-                if (currentPiece.getPieceType() == ChessPiece.PieceType.KING && currentPiece.getTeamColor() == myColor) {
-                    return currentPosition;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns true if there is a possible move to protect the king
-     *
-     * @param myColor King's color
-     * @return true if there is a move to protect the king, false otherwise
-     */
-    private boolean checkKingProtection(TeamColor myColor) {
-        for (int i = 1; i < 9; i++) {
-            for (int j = 1; j < 9; j++) {
-                ChessPosition currentPosition = new ChessPosition(i, j);
-                ChessPiece currentPiece = chessboard.getPiece(currentPosition);
-                if (currentPiece == null || currentPiece.getTeamColor() != myColor
-                        || currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
-                    continue;
-                }
-
-                Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(chessboard, currentPosition);
-
-                for (ChessMove move : possibleMoves) {
-                    ChessBoard tempBoard = makeMoveForceful(move);
-                    ChessPosition kingPosition = findKing(tempBoard, myColor);
-                    if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Make a new ChessBoard with a new move made, no checks are made for if the move is valid.
-     *
-     * @param move ChessMove to make
-     * @return ChessBoard with the given move made
-     */
-    private ChessBoard makeMoveForceful(ChessMove move) {
-        ChessBoard newBoard = new ChessBoard();
-        newBoard.setGivenBoard(chessboard);
-        newBoard.makeMove(move);
-        return newBoard;
-    }
-
-    private ChessMove expandCastleMove(ChessMove castleMove) {
-        int row = castleMove.getStartPosition().getRow();
-        if (castleMove.getEndPosition().getColumn() == 7) {
-            return new ChessMove(castleMove.getStartPosition(), new ChessPosition(row, 6), null);
-        } else {
-            return new ChessMove(castleMove.getStartPosition(), new ChessPosition(row, 4), null);
-        }
-    }
-
     /**
      * @return Which team's turn it is
      */
@@ -140,11 +51,7 @@ public class ChessGame {
         WHITE,
         BLACK
     }
-
-    private boolean checkPawnPosition(ChessPosition pawnPosition) {
-        return (pawnPosition.getColumn() == doubleMovedPawn.getColumn() - 1 || pawnPosition.getColumn() == doubleMovedPawn.getColumn() + 1) && pawnPosition.getRow() == doubleMovedPawn.getRow();
-    }
-
+    
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -163,33 +70,22 @@ public class ChessGame {
         Collection<ChessMove> possibleMoves = myPiece.pieceMoves(chessboard, startPosition);
         ArrayList<ChessMove> valid = new ArrayList<ChessMove>();
 
-        for (ChessMove currentMove : possibleMoves) {
-            if (kingFlag && chessboard.getMoveManager().kingWantsCastle(currentMove)) {
-                ChessMove expanded = expandCastleMove(currentMove);
-                ChessBoard tempBoard = makeMoveForceful(expanded);
-                ChessPosition kingPosition = findKing(tempBoard, myColor);
+        ChessPosition kingPosition = findKing(chessboard, myColor);
 
-                ChessBoard tempBoard2 = makeMoveForceful(currentMove);
-                ChessPosition kingPosition2 = findKing(tempBoard2, myColor);
-                if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor) && !moveFilter.checkIfInCheck(tempBoard2, kingPosition2, myColor) && !moveFilter.checkIfInCheck(chessboard, findKing(chessboard, myColor), myColor)) {
-                    valid.add(currentMove);
+        for (ChessMove currentMove : possibleMoves) {
+            if (kingFlag) {
+                if (chessboard.getMoveManager().kingWantsCastle(currentMove)) {
+                    addCastle(currentMove, myColor, valid);
+                } else {
+                    kingPosition = currentMove.getEndPosition();
+                    addValidMove(currentMove, kingPosition, myColor, valid);
                 }
             } else {
-                ChessBoard tempBoard = makeMoveForceful(currentMove);
-                ChessPosition kingPosition = findKing(tempBoard, myColor);
-                if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor)) {
-                    valid.add(currentMove);
-                }
+                addValidMove(currentMove, kingPosition, myColor, valid);
             }
         }
 
-        boolean pawnFlag = myPiece.getPieceType() == ChessPiece.PieceType.PAWN;
-        if (pawnFlag && enPassantPossible) {
-            if (checkPawnPosition(startPosition)) {
-                int newRow = doubleMovedPawn.getRow() == 4 ? 3 : 6;
-                valid.add(new ChessMove(startPosition, new ChessPosition(newRow, doubleMovedPawn.getColumn()), null));
-            }
-        }
+        addEnPassant(myPiece, startPosition, valid);
         return valid;
     }
 
@@ -214,10 +110,7 @@ public class ChessGame {
         }
 
         if (valid.contains(move)) {
-            if (!checkPawnMoveAndUpdate(move)) {
-                enPassantPossible = false;
-                doubleMovedPawn = null;
-            }
+            checkPawnMoveAndUpdate(move);
             chessboard.makeMove(move);
             setTeamTurn(teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
         } else {
@@ -312,5 +205,175 @@ public class ChessGame {
     @Override
     public int hashCode() {
         return Objects.hash(chessboard.hashCode(), teamTurn);
+    }
+
+    /**
+     * Checks if a pawn is moving, and if it is a double move that could result in an en passant.
+     * Updates trackers accordingly.
+     *
+     * @param move move to be made
+     */
+    private void checkPawnMoveAndUpdate(ChessMove move) {
+        ChessPiece myPiece = chessboard.getPiece(move.getStartPosition());
+        int startRow = move.getStartPosition().getRow();
+        int endRow = move.getEndPosition().getRow();
+
+        if (myPiece.getPieceType() == ChessPiece.PieceType.PAWN && startRow + 2 == endRow || startRow - 2 == endRow) {
+            enPassantPossible = true;
+            doubleMovedPawn = move.getEndPosition();
+        } else {
+            enPassantPossible = false;
+            doubleMovedPawn = null;
+        }
+    }
+
+    /**
+     * Checks if a move is valid, and if it is, adds it to the Collection
+     *
+     * @param currentMove  move to be made
+     * @param kingPosition king's current position
+     * @param myColor      team color
+     * @param valid        Collection of valid ChessMoves
+     */
+    private void addValidMove(ChessMove currentMove, ChessPosition kingPosition, TeamColor myColor, Collection<ChessMove> valid) {
+        ChessBoard tempBoard = makeMoveForceful(currentMove);
+        if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor)) {
+            valid.add(currentMove);
+        }
+    }
+
+    /**
+     * Checks if a castle is possible, and if it is, adds the moves to the Collection
+     *
+     * @param currentMove castle move
+     * @param myColor     team color
+     * @param valid       Collection of valid ChessMoves
+     */
+    private void addCastle(ChessMove currentMove, TeamColor myColor, Collection<ChessMove> valid) {
+        if (moveFilter.checkIfInCheck(chessboard, currentMove.getStartPosition(), myColor)) {
+            return;
+        }
+
+        ChessMove expanded = expandCastleMove(currentMove);
+        ChessBoard tempBoard = makeMoveForceful(expanded);
+        ChessPosition kingPosition = expanded.getEndPosition();
+
+        ChessBoard tempBoard2 = makeMoveForceful(currentMove);
+        ChessPosition kingPosition2 = currentMove.getEndPosition();
+        if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor) && !moveFilter.checkIfInCheck(tempBoard2, kingPosition2, myColor)) {
+            valid.add(currentMove);
+        }
+    }
+
+    /**
+     * Checks the pawns position, to see if an enPassant is possible
+     *
+     * @param pawnPosition pawns position
+     * @return true if an enPassant is possible, false if not
+     */
+    private boolean checkPawnPosition(ChessPosition pawnPosition) {
+        int pawnRow = pawnPosition.getRow();
+        int pawnCol = pawnPosition.getColumn();
+        int doubleMovedPawnRow = doubleMovedPawn.getRow();
+        int doubleMovedPawnCol = doubleMovedPawn.getColumn();
+        return (pawnCol == doubleMovedPawnCol - 1 || pawnCol == doubleMovedPawnCol + 1) && pawnRow == doubleMovedPawnRow;
+    }
+
+    /**
+     * Adds the enPassant move if it is valid
+     *
+     * @param myPiece       the current ChessPiece
+     * @param startPosition the ChessPiece's start position
+     * @param valid         collection of valid ChessMoves
+     */
+    private void addEnPassant(ChessPiece myPiece, ChessPosition startPosition, Collection<ChessMove> valid) {
+        boolean pawnFlag = myPiece.getPieceType() == ChessPiece.PieceType.PAWN;
+        if (pawnFlag && enPassantPossible) {
+            if (checkPawnPosition(startPosition)) {
+                int newRow = doubleMovedPawn.getRow() == 4 ? 3 : 6;
+                valid.add(new ChessMove(startPosition, new ChessPosition(newRow, doubleMovedPawn.getColumn()), null));
+            }
+        }
+    }
+
+    /**
+     * Finds the king of the given color on a given board
+     *
+     * @param board   current board
+     * @param myColor color of the king to find
+     * @return the ChessPosition containing the king, null if it cannot be found
+     */
+    private ChessPosition findKing(ChessBoard board, TeamColor myColor) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition currentPosition = new ChessPosition(i, j);
+                ChessPiece currentPiece = board.getPiece(currentPosition);
+                if (currentPiece == null) {
+                    continue;
+                }
+                if (currentPiece.getPieceType() == ChessPiece.PieceType.KING && currentPiece.getTeamColor() == myColor) {
+                    return currentPosition;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns true if there is a possible move to protect the king
+     *
+     * @param myColor King's color
+     * @return true if there is a move to protect the king, false otherwise
+     */
+    private boolean checkKingProtection(TeamColor myColor) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition currentPosition = new ChessPosition(i, j);
+                ChessPiece currentPiece = chessboard.getPiece(currentPosition);
+                if (currentPiece == null || currentPiece.getTeamColor() != myColor
+                        || currentPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    continue;
+                }
+
+                Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(chessboard, currentPosition);
+
+                for (ChessMove move : possibleMoves) {
+                    ChessBoard tempBoard = makeMoveForceful(move);
+                    ChessPosition kingPosition = findKing(tempBoard, myColor);
+                    if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Make a new ChessBoard with a new move made, no checks are made for if the move is valid.
+     *
+     * @param move ChessMove to make
+     * @return ChessBoard with the given move made
+     */
+    private ChessBoard makeMoveForceful(ChessMove move) {
+        ChessBoard newBoard = new ChessBoard();
+        newBoard.setGivenBoard(chessboard);
+        newBoard.makeMove(move);
+        return newBoard;
+    }
+
+    /**
+     * Returns the additional move that must be checked for a castle to be safe
+     *
+     * @param castleMove ChessMove that represents a castle
+     * @return the ChessMove that represents the square the king crosses
+     */
+    private ChessMove expandCastleMove(ChessMove castleMove) {
+        int row = castleMove.getStartPosition().getRow();
+        if (castleMove.getEndPosition().getColumn() == 7) {
+            return new ChessMove(castleMove.getStartPosition(), new ChessPosition(row, 6), null);
+        } else {
+            return new ChessMove(castleMove.getStartPosition(), new ChessPosition(row, 4), null);
+        }
     }
 }
