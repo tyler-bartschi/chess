@@ -53,12 +53,17 @@ public class ChessBoard {
      * @param move the desired ChessMove
      * @return true if it is a castling move, false otherwise
      */
-    private boolean kingWantsCastle(ChessMove move) {
+    public boolean kingWantsCastle(ChessMove move) {
         int startColumn = move.getStartPosition().getColumn();
         int endColumn = move.getEndPosition().getColumn();
-        return endColumn == startColumn + 3 || endColumn == startColumn - 4;
+        return endColumn == startColumn + 2 || endColumn == startColumn - 2;
     }
 
+    /**
+     * Returns a reference to the moveManager
+     *
+     * @return the board's moveManager
+     */
     public MovementRule getMoveManager() {
         return moveManager;
     }
@@ -113,9 +118,14 @@ public class ChessBoard {
         ChessPiece currentPiece = getPiece(move.getStartPosition());
 
         if (currentPiece.getPieceType() == ChessPiece.PieceType.KING && kingWantsCastle(move)) {
-            ChessPiece rookPiece = getPiece(move.getEndPosition());
+            int rookStartCol = move.getEndPosition().getColumn() == 7 ? 8 : 1;
+            ChessPiece rookPiece = getPiece(new ChessPosition(move.getStartPosition().getRow(), rookStartCol));
             addPiece(move.getEndPosition(), currentPiece);
-            addPiece(move.getStartPosition(), rookPiece);
+            int rookEndCol = move.getEndPosition().getColumn() == 7 ? 6 : 4;
+            addPiece(new ChessPosition(move.getStartPosition().getRow(), rookEndCol), rookPiece);
+
+            addPiece(move.getStartPosition(), null);
+            addPiece(new ChessPosition(move.getStartPosition().getRow(), rookStartCol), null);
         } else {
             if (move.getPromotionPiece() != null) {
                 currentPiece = new ChessPiece(currentPiece.getTeamColor(), move.getPromotionPiece());

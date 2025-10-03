@@ -89,6 +89,15 @@ public class ChessGame {
         return newBoard;
     }
 
+    private ChessMove expandCastleMove(ChessMove castleMove) {
+        int row = castleMove.getStartPosition().getRow();
+        if (castleMove.getEndPosition().getColumn() == 7) {
+            return new ChessMove(castleMove.getStartPosition(), new ChessPosition(row, 6), null);
+        } else {
+            return new ChessMove(castleMove.getStartPosition(), new ChessPosition(row, 4), null);
+        }
+    }
+
     /**
      * @return Which team's turn it is
      */
@@ -126,15 +135,28 @@ public class ChessGame {
             return null;
         }
         TeamColor myColor = myPiece.getTeamColor();
+        boolean kingFlag = myPiece.getPieceType() == ChessPiece.PieceType.KING;
 
         Collection<ChessMove> possibleMoves = myPiece.pieceMoves(chessboard, startPosition);
         ArrayList<ChessMove> valid = new ArrayList<ChessMove>();
 
         for (ChessMove currentMove : possibleMoves) {
-            ChessBoard tempBoard = makeMoveForceful(currentMove);
-            ChessPosition kingPosition = findKing(tempBoard, myColor);
-            if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor)) {
-                valid.add(currentMove);
+            if (kingFlag && chessboard.kingWantsCastle(currentMove)) {
+                ChessMove expanded = expandCastleMove(currentMove);
+                ChessBoard tempBoard = makeMoveForceful(expanded);
+                ChessPosition kingPosition = findKing(tempBoard, myColor);
+
+                ChessBoard tempBoard2 = makeMoveForceful(currentMove);
+                ChessPosition kingPosition2 = findKing(tempBoard2, myColor);
+                if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor) && !moveFilter.checkIfInCheck(tempBoard2, kingPosition2, myColor) && !moveFilter.checkIfInCheck(chessboard, findKing(chessboard, myColor), myColor)) {
+                    valid.add(currentMove);
+                }
+            } else {
+                ChessBoard tempBoard = makeMoveForceful(currentMove);
+                ChessPosition kingPosition = findKing(tempBoard, myColor);
+                if (!moveFilter.checkIfInCheck(tempBoard, kingPosition, myColor)) {
+                    valid.add(currentMove);
+                }
             }
         }
         return valid;

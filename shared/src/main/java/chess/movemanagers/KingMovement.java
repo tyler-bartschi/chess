@@ -74,11 +74,11 @@ public class KingMovement extends BaseMovementRule {
         ChessPiece secondRook = board.getPiece(secondRookPosition);
 
         if (checkIsRook(firstRook) && !firstRook.getHasMoved() && checkBetweenLeft(board, startRow)) {
-            possibleMoves.add(new ChessMove(myPosition, new ChessPosition(startRow, 1), null));
+            possibleMoves.add(new ChessMove(myPosition, new ChessPosition(startRow, 3), null));
         }
 
         if (checkIsRook(secondRook) && !secondRook.getHasMoved() && checkBetweenRight(board, startRow)) {
-            possibleMoves.add(new ChessMove(myPosition, new ChessPosition(startRow, 8), null));
+            possibleMoves.add(new ChessMove(myPosition, new ChessPosition(startRow, 7), null));
         }
 
     }
