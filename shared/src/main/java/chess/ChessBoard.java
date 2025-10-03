@@ -22,53 +22,11 @@ public class ChessBoard {
     }
 
     /**
-     * Adds all pieces of a single color to the board
-     *
-     * @param color Team Color
-     */
-    private void addAllPieces(ChessGame.TeamColor color) {
-        ChessPiece[] pieces = {
-                new ChessPiece(color, ChessPiece.PieceType.ROOK),
-                new ChessPiece(color, ChessPiece.PieceType.KNIGHT),
-                new ChessPiece(color, ChessPiece.PieceType.BISHOP),
-                new ChessPiece(color, ChessPiece.PieceType.QUEEN),
-                new ChessPiece(color, ChessPiece.PieceType.KING),
-                new ChessPiece(color, ChessPiece.PieceType.BISHOP),
-                new ChessPiece(color, ChessPiece.PieceType.KNIGHT),
-                new ChessPiece(color, ChessPiece.PieceType.ROOK)
-        };
-
-        int row = color == ChessGame.TeamColor.WHITE ? 1 : 8;
-        int pawnRow = color == ChessGame.TeamColor.WHITE ? 2 : 7;
-
-        for (int i = 0; i < pieces.length; i++) {
-            addPiece(new ChessPosition(row, i + 1), pieces[i]);
-            addPiece(new ChessPosition(pawnRow, i + 1), new ChessPiece(color, ChessPiece.PieceType.PAWN));
-        }
-    }
-
-    /**
-     * Checks whether the move is a castle move or not
-     *
-     * @param move the desired ChessMove
-     * @return true if it is a castling move, false otherwise
-     */
-    public boolean kingWantsCastle(ChessMove move) {
-        int startColumn = move.getStartPosition().getColumn();
-        int endColumn = move.getEndPosition().getColumn();
-        return endColumn == startColumn + 2 || endColumn == startColumn - 2;
-    }
-
-    private boolean pawnWantsEnPassant(ChessMove move) {
-        return getPiece(move.getEndPosition()) == null && move.getEndPosition().getRow() != 8 && move.getEndPosition().getRow() != 1;
-    }
-
-    /**
      * Returns a reference to the moveManager
      *
      * @return the board's moveManager
      */
-    public MovementRule getMoveManager() {
+    public MoveManager getMoveManager() {
         return moveManager;
     }
 
@@ -117,32 +75,26 @@ public class ChessBoard {
         return board[position.getRow() - 1][position.getColumn() - 1];
     }
 
-
+    /**
+     * Makes a ChessMove
+     *
+     * @param move move to make
+     */
     public void makeMove(ChessMove move) {
         ChessPiece currentPiece = getPiece(move.getStartPosition());
+        ChessPiece.PieceType pieceType = currentPiece.getPieceType();
 
-        if (currentPiece.getPieceType() == ChessPiece.PieceType.KING && kingWantsCastle(move)) {
-            int rookStartCol = move.getEndPosition().getColumn() == 7 ? 8 : 1;
-            ChessPiece rookPiece = getPiece(new ChessPosition(move.getStartPosition().getRow(), rookStartCol));
-            addPiece(move.getEndPosition(), currentPiece);
-            int rookEndCol = move.getEndPosition().getColumn() == 7 ? 6 : 4;
-            addPiece(new ChessPosition(move.getStartPosition().getRow(), rookEndCol), rookPiece);
-
-            addPiece(move.getStartPosition(), null);
-            addPiece(new ChessPosition(move.getStartPosition().getRow(), rookStartCol), null);
-        } else if (currentPiece.getPieceType() == ChessPiece.PieceType.PAWN && pawnWantsEnPassant(move)) {
-            addPiece(move.getEndPosition(), currentPiece);
-            int capturedRow = move.getEndPosition().getRow() == 3 ? 4 : 5;
-            addPiece(new ChessPosition(capturedRow, move.getEndPosition().getColumn()), null);
-            addPiece(move.getStartPosition(), null);
-        } else {
-            if (move.getPromotionPiece() != null) {
-                currentPiece = new ChessPiece(currentPiece.getTeamColor(), move.getPromotionPiece());
-            }
-            addPiece(move.getEndPosition(), currentPiece);
-            addPiece(move.getStartPosition(), null);
-            currentPiece.setHasMoved();
+        if (pieceType == ChessPiece.PieceType.KING && moveManager.kingWantsCastle(move)) {
+            moveRookForCastle(move);
+        } else if (pieceType == ChessPiece.PieceType.PAWN && moveManager.pawnWantsEnPassant(this, move)) {
+            removeEnPassantPawn(move);
+        } else if (move.getPromotionPiece() != null) {
+            currentPiece = new ChessPiece(currentPiece.getTeamColor(), move.getPromotionPiece());
         }
+
+        addPiece(move.getEndPosition(), currentPiece);
+        addPiece(move.getStartPosition(), null);
+        currentPiece.setHasMoved();
     }
 
     /**
@@ -208,5 +160,59 @@ public class ChessBoard {
             }
         }
         return code;
+    }
+
+    /**
+     * Adds all pieces of a single color to the board
+     *
+     * @param color Team Color
+     */
+    private void addAllPieces(ChessGame.TeamColor color) {
+        ChessPiece[] pieces = {
+                new ChessPiece(color, ChessPiece.PieceType.ROOK),
+                new ChessPiece(color, ChessPiece.PieceType.KNIGHT),
+                new ChessPiece(color, ChessPiece.PieceType.BISHOP),
+                new ChessPiece(color, ChessPiece.PieceType.QUEEN),
+                new ChessPiece(color, ChessPiece.PieceType.KING),
+                new ChessPiece(color, ChessPiece.PieceType.BISHOP),
+                new ChessPiece(color, ChessPiece.PieceType.KNIGHT),
+                new ChessPiece(color, ChessPiece.PieceType.ROOK)
+        };
+
+        int row = color == ChessGame.TeamColor.WHITE ? 1 : 8;
+        int pawnRow = color == ChessGame.TeamColor.WHITE ? 2 : 7;
+
+        for (int i = 0; i < pieces.length; i++) {
+            addPiece(new ChessPosition(row, i + 1), pieces[i]);
+            addPiece(new ChessPosition(pawnRow, i + 1), new ChessPiece(color, ChessPiece.PieceType.PAWN));
+        }
+    }
+
+    /**
+     * Moves the rook for a castling move
+     *
+     * @param kingsMove the move the king was making
+     */
+    private void moveRookForCastle(ChessMove kingsMove) {
+        int kingsColumn = kingsMove.getEndPosition().getColumn();
+        int kingsRow = kingsMove.getStartPosition().getRow();
+        int rookStartCol = kingsColumn == 7 ? 8 : 1;
+        int rookEndCol = kingsColumn == 7 ? 6 : 4;
+
+        ChessPosition rooksPosition = new ChessPosition(kingsRow, rookStartCol);
+        ChessPiece rookPiece = getPiece(rooksPosition);
+
+        addPiece(new ChessPosition(kingsRow, rookEndCol), rookPiece);
+        addPiece(rooksPosition, null);
+    }
+
+    /**
+     * Removes the pawn captured by an EnPassant
+     *
+     * @param move the move the capturing pawn made
+     */
+    private void removeEnPassantPawn(ChessMove move) {
+        int capturedRow = move.getEndPosition().getRow() == 3 ? 4 : 5;
+        addPiece(new ChessPosition(capturedRow, move.getEndPosition().getColumn()), null);
     }
 }

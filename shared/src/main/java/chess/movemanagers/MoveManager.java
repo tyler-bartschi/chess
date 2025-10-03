@@ -16,6 +16,33 @@ public class MoveManager implements MovementRule {
     private final MovementRule king = new KingMovement();
     private final MovementRule pawn = new PawnMovement();
 
+    public MoveManager() {
+
+    }
+
+    /**
+     * Checks whether the move is a castle move or not
+     *
+     * @param move the desired ChessMove
+     * @return true if it is a castling move, false otherwise
+     */
+    public boolean kingWantsCastle(ChessMove move) {
+        int startColumn = move.getStartPosition().getColumn();
+        int endColumn = move.getEndPosition().getColumn();
+        return endColumn == startColumn + 2 || endColumn == startColumn - 2;
+    }
+
+    /**
+     * Checks if a pawn's move will be EnPassant or not
+     *
+     * @param move the move being made
+     * @return true if an enPassant move, false otherwise
+     */
+    public boolean pawnWantsEnPassant(ChessBoard board, ChessMove move) {
+        return board.getPiece(move.getEndPosition()) == null &&
+                move.getEndPosition().getRow() != 8 && move.getEndPosition().getRow() != 1;
+    }
+
     /**
      * Determines what type the current piece is and calls a MovementRule accordingly
      *

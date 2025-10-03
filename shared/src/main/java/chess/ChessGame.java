@@ -164,7 +164,7 @@ public class ChessGame {
         ArrayList<ChessMove> valid = new ArrayList<ChessMove>();
 
         for (ChessMove currentMove : possibleMoves) {
-            if (kingFlag && chessboard.kingWantsCastle(currentMove)) {
+            if (kingFlag && chessboard.getMoveManager().kingWantsCastle(currentMove)) {
                 ChessMove expanded = expandCastleMove(currentMove);
                 ChessBoard tempBoard = makeMoveForceful(expanded);
                 ChessPosition kingPosition = findKing(tempBoard, myColor);
