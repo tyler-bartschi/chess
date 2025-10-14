@@ -3,14 +3,18 @@ package server;
 import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
+import model.*;
+import service.UserService;
 
 import java.util.Map;
 
 public class Server {
 
     private final Javalin server;
+    private final UserService userService;
 
     public Server() {
+        userService = new UserService();
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
@@ -26,12 +30,12 @@ public class Server {
     private void register(Context ctx) {
         var serializer = new Gson();
         String requestJson = ctx.body();
-        var req = serializer.fromJson(requestJson, Map.class);
+        var user = serializer.fromJson(requestJson, UserData.class);
 
         // call to the service and register
+        var authData = userService.register(user);
 
-        var res = Map.of("username", req.get("username"), "authToken", "yzx");
-        ctx.result(serializer.toJson(res));
+        ctx.result(serializer.toJson(authData));
     }
 
     public int run(int desiredPort) {
