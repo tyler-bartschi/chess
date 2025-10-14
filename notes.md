@@ -75,4 +75,11 @@ Special values include Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, and D
 ### Collections
 
 - if I want to use my objects within a class that sorts them, I must implement the Comparable interface, which returns a negative integer if the object is less, zero if they are equal, and a positive integer if the object is greater than the object provided as a parameter to `compareTo`.
+
+### Inner Classes
+
+- Static Inner Classes - defined within the scope of another class
+- Inner Classes - defined within the scope of another class and shares the `this` pointer
+- Local Inner Classes - defined within the scope of a block and shares scope variables
+- Anonymous Inner Classes - defiend without a class anme and shares scope variables
 - 
