@@ -11,32 +11,22 @@ import service.UserService;
 public class Server {
 
     private final Javalin server;
-    private final UserService userService;
-
-    // handlers
-    private final ClearHandler clearHandler;
-    private final RegisterHandler registerHandler;
-    private final LoginHandler loginHandler;
-    private final LogoutHandler logoutHandler;
-    private final CreateGameHandler createGameHandler;
-    private final JoinGameHandler joinGameHandler;
-    private final ListGamesHandler listGamesHandler;
 
     public Server() {
         // initialize dataAccess
         DataAccess dataAccess = new MemoryDataAccess();
 
         // initialize services
-        userService = new UserService(dataAccess);
+        final UserService userService = new UserService(dataAccess);
 
         // initialize handlers
-        clearHandler = new ClearHandler(userService);
-        registerHandler = new RegisterHandler(userService);
-        loginHandler = new LoginHandler(userService);
-        logoutHandler = new LogoutHandler();
-        createGameHandler = new CreateGameHandler();
-        joinGameHandler = new JoinGameHandler();
-        listGamesHandler = new ListGamesHandler();
+        final ClearHandler clearHandler = new ClearHandler(userService);
+        final RegisterHandler registerHandler = new RegisterHandler(userService);
+        final LoginHandler loginHandler = new LoginHandler(userService);
+        final LogoutHandler logoutHandler = new LogoutHandler();
+        final CreateGameHandler createGameHandler = new CreateGameHandler();
+        final JoinGameHandler joinGameHandler = new JoinGameHandler();
+        final ListGamesHandler listGamesHandler = new ListGamesHandler();
 
 
         // initialize server
@@ -47,8 +37,8 @@ public class Server {
         server.post("session", loginHandler::login);
 
         server.exception(InvalidRequestException.class, this::handleInvalidRequestException);
-        server.exception(AlreadyTakenException.class, this::handleAlreadyTakenException);
         server.exception(UnauthorizedException.class, this::handleUnauthorizedException);
+        server.exception(AlreadyTakenException.class, this::handleAlreadyTakenException);
 
         server.exception(Exception.class, this::handleUncaughtException);
 
@@ -67,12 +57,12 @@ public class Server {
         ctx.status(400).result(getErrorMessage(ex));
     }
 
-    private void handleAlreadyTakenException(AlreadyTakenException ex, Context ctx) {
-        ctx.status(403).result(getErrorMessage(ex));
-    }
-
     private void handleUnauthorizedException(UnauthorizedException ex, Context ctx) {
         ctx.status(401).result(getErrorMessage(ex));
+    }
+
+    private void handleAlreadyTakenException(AlreadyTakenException ex, Context ctx) {
+        ctx.status(403).result(getErrorMessage(ex));
     }
 
     private void handleUncaughtException(Exception ex, Context ctx) {
