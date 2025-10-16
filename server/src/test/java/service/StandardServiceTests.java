@@ -22,7 +22,7 @@ public class StandardServiceTests {
         testDataAccess = new MemoryDataAccess();
         testUserService = new UserService(testDataAccess);
         RegisterRequest request = new RegisterRequest(START_USERNAME, START_EMAIL, START_PASSWORD);
-        testUserService.register(request);
+        Assertions.assertDoesNotThrow(() -> testUserService.register(request), "initial register in initialization fails");
     }
 
 
@@ -31,7 +31,7 @@ public class StandardServiceTests {
     @DisplayName("Register Successful")
     public void registerSuccess() {
         RegisterRequest request = new RegisterRequest("myUser", "myEmail", "123");
-        RegisterResult result = testUserService.register(request);
+        RegisterResult result = Assertions.assertDoesNotThrow(() -> testUserService.register(request), "Initial register failed");
         Assertions.assertNotNull(result, "Result was null");
         Assertions.assertNotNull(result.authToken(), "Result did not contain an authToken");
         Assertions.assertEquals(request.username(), result.username(), "Username of result does not match username of request");
@@ -50,7 +50,7 @@ public class StandardServiceTests {
     @DisplayName("Login Successful")
     public void loginSuccess() {
         LoginRequest request = new LoginRequest(START_USERNAME, START_PASSWORD);
-        LoginResult result = testUserService.login(request);
+        LoginResult result = Assertions.assertDoesNotThrow(() -> testUserService.login(request), "Initial login failed");
         Assertions.assertNotNull(result, "Result was null");
         Assertions.assertNotNull(result.authToken(), "Result did not contain an authToken");
         Assertions.assertEquals(request.username(), result.username(), "Username of result does not match username of request");
