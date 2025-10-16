@@ -1,10 +1,12 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.*;
+import server.handlers.*;
 import service.UserService;
 
 import java.util.Map;
@@ -14,9 +16,33 @@ public class Server {
     private final Javalin server;
     private final UserService userService;
 
+    // handlers
+    private final ClearHandler clearHandler;
+    private final RegisterHandler registerHandler;
+    private final LoginHandler loginHandler;
+    private final LogoutHandler logoutHandler;
+    private final CreateGameHandler createGameHandler;
+    private final JoinGameHandler joinGameHandler;
+    private final ListGamesHandler listGamesHandler;
+
     public Server() {
-        var dataAccess = new MemoryDataAccess();
+        // initialize dataAccess
+        DataAccess dataAccess = new MemoryDataAccess();
+
+        // initialize services
         userService = new UserService(dataAccess);
+
+        // initialize handlers
+        clearHandler = new ClearHandler(userService);
+        registerHandler = new RegisterHandler(userService);
+        loginHandler = new LoginHandler();
+        logoutHandler = new LogoutHandler();
+        createGameHandler = new CreateGameHandler();
+        joinGameHandler = new JoinGameHandler();
+        listGamesHandler = new ListGamesHandler();
+
+
+        // initialize server
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
@@ -25,24 +51,11 @@ public class Server {
         // data back to the asking source
         server.delete("db", ctx -> ctx.result("{}"));
         // this::register is the same as ctx -> register(ctx)
-        server.post("user", this::register);
+        server.post("user", registerHandler::register);
 
-    }
+        server.exception(InvalidRequestException.class, this::handleInvalidRequestException);
+        server.exception(AlreadyTakenException.class, this::handleAlreadyTakenException);
 
-    private void register(Context ctx) {
-        try {
-            var serializer = new Gson();
-            String requestJson = ctx.body();
-            var user = serializer.fromJson(requestJson, UserData.class);
-
-            // call to the service and register
-            var authData = userService.register(user);
-
-            ctx.result(serializer.toJson(authData));
-        } catch (Exception ex) {
-            var msg = String.format("{\"message\": \"Error: %s\"}", ex.getMessage());
-            ctx.status(403).result(msg);
-        }
     }
 
     public int run(int desiredPort) {
@@ -52,5 +65,15 @@ public class Server {
 
     public void stop() {
         server.stop();
+    }
+
+    private void handleInvalidRequestException(InvalidRequestException ex, Context ctx) {
+        var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
+        ctx.status(400).result(msg);
+    }
+
+    private void handleAlreadyTakenException(AlreadyTakenException ex, Context ctx) {
+        var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
+        ctx.status(403).result(msg);
     }
 }

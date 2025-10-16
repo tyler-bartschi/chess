@@ -3,24 +3,35 @@ package service;
 import dataaccess.DataAccess;
 import model.AuthData;
 import model.UserData;
+import server.AlreadyTakenException;
+import service.requests.*;
+import service.results.*;
+
+import java.util.UUID;
 
 public class UserService {
     private final DataAccess dataAccess;
 
     public UserService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
-
     }
 
-    public AuthData register(UserData user) throws Exception {
+    public RegisterResult register(RegisterRequest user) throws AlreadyTakenException {
         if (dataAccess.getUser(user.username()) != null) {
-            // look at petshop for handling exceptions
-            throw new Exception("already exists");
+            throw new AlreadyTakenException("This username is already taken");
         }
-        return new AuthData(user.username(), generateAuthToken());
+
+        UserData newUser = new UserData(user.username(), user.email(), user.password());
+
+        dataAccess.createUser(newUser);
+
+        AuthData newAuth = new AuthData(user.username(), generateAuthToken());
+        dataAccess.createAuth(newAuth);
+
+        return new RegisterResult(newAuth.username(), newAuth.authToken());
     }
 
     private String generateAuthToken() {
-        return "xyz";
+        return UUID.randomUUID().toString();
     }
 }
