@@ -24,12 +24,12 @@ public class RegisterHandler {
         var serializer = new Gson();
         String requestJson = ctx.body();
         checkDataValidity(serializer, requestJson);
-        var user = serializer.fromJson(requestJson, RegisterRequest.class);
+        RegisterRequest req = serializer.fromJson(requestJson, RegisterRequest.class);
 
         // call to the service and register
-        RegisterResult authData = userService.register(user);
+        RegisterResult res = userService.register(req);
 
-        ctx.result(serializer.toJson(authData));
+        ctx.result(serializer.toJson(res));
 
     }
 

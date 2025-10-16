@@ -4,8 +4,7 @@ import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
-import server.exceptions.AlreadyTakenException;
-import server.exceptions.InvalidRequestException;
+import server.exceptions.*;
 import server.handlers.*;
 import service.UserService;
 
@@ -33,7 +32,7 @@ public class Server {
         // initialize handlers
         clearHandler = new ClearHandler(userService);
         registerHandler = new RegisterHandler(userService);
-        loginHandler = new LoginHandler();
+        loginHandler = new LoginHandler(userService);
         logoutHandler = new LogoutHandler();
         createGameHandler = new CreateGameHandler();
         joinGameHandler = new JoinGameHandler();
@@ -43,16 +42,13 @@ public class Server {
         // initialize server
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        // Register your endpoints and exception handlers here.
-
-        // ctx is a Context object that contains the request and the result. When you call result it sends
-        // data back to the asking source
         server.delete("db", clearHandler::clear);
-        // this::register is the same as ctx -> register(ctx)
         server.post("user", registerHandler::register);
+        server.post("session", loginHandler::login);
 
         server.exception(InvalidRequestException.class, this::handleInvalidRequestException);
         server.exception(AlreadyTakenException.class, this::handleAlreadyTakenException);
+        server.exception(UnauthorizedException.class, this::handleUnauthorizedException);
 
         server.exception(Exception.class, this::handleUncaughtException);
 
@@ -73,6 +69,10 @@ public class Server {
 
     private void handleAlreadyTakenException(AlreadyTakenException ex, Context ctx) {
         ctx.status(403).result(getErrorMessage(ex));
+    }
+
+    private void handleUnauthorizedException(UnauthorizedException ex, Context ctx) {
+        ctx.status(401).result(getErrorMessage(ex));
     }
 
     private void handleUncaughtException(Exception ex, Context ctx) {

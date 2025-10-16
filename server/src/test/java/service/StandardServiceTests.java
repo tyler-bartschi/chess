@@ -33,7 +33,7 @@ public class StandardServiceTests {
         RegisterRequest request = new RegisterRequest("myUser", "myEmail", "123");
         RegisterResult result = testUserService.register(request);
         Assertions.assertNotNull(result, "Result was null");
-        Assertions.assertNotNull(result.authToken(), "Result did not contain and AuthToken");
+        Assertions.assertNotNull(result.authToken(), "Result did not contain an authToken");
         Assertions.assertEquals(request.username(), result.username(), "Username of result does not match username of request");
     }
 
@@ -47,6 +47,35 @@ public class StandardServiceTests {
 
     @Test
     @Order(3)
+    @DisplayName("Login Successful")
+    public void loginSuccess() {
+        LoginRequest request = new LoginRequest(START_USERNAME, START_PASSWORD);
+        LoginResult result = testUserService.login(request);
+        Assertions.assertNotNull(result, "Result was null");
+        Assertions.assertNotNull(result.authToken(), "Result did not contain an authToken");
+        Assertions.assertEquals(request.username(), result.username(), "Username of result does not match username of request");
+
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Login Bad Password")
+    public void loginBadPass() {
+        LoginRequest request = new LoginRequest(START_USERNAME, "notPassword");
+        Assertions.assertThrows(UnauthorizedException.class, () -> testUserService.login(request), "Does not throw an unauthorized exception for invalid password");
+
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("Login Invalid Username")
+    public void loginBadUser() {
+        LoginRequest request = new LoginRequest("nonExistentUser", "123");
+        Assertions.assertThrows(UnauthorizedException.class, () -> testUserService.login(request), "Does not throw an unauthorized exception for invalid username");
+    }
+
+    @Test
+    @Order(6)
     @DisplayName("Clear Successful")
     public void clearSuccess() {
         testUserService.clear();
