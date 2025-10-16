@@ -3,7 +3,7 @@ package service;
 import dataaccess.DataAccess;
 import model.AuthData;
 import model.UserData;
-import server.AlreadyTakenException;
+import server.exceptions.AlreadyTakenException;
 import service.requests.*;
 import service.results.*;
 

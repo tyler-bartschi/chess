@@ -1,15 +1,13 @@
 package server;
 
-import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
-import model.*;
+import server.exceptions.AlreadyTakenException;
+import server.exceptions.InvalidRequestException;
 import server.handlers.*;
 import service.UserService;
-
-import java.util.Map;
 
 public class Server {
 

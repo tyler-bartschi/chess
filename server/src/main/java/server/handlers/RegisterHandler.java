@@ -4,12 +4,13 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import io.javalin.http.Context;
-import model.UserData;
-import server.AlreadyTakenException;
+
+import server.exceptions.AlreadyTakenException;
+import server.exceptions.InvalidRequestException;
+
 import service.UserService;
 import service.requests.RegisterRequest;
 import service.results.RegisterResult;
-import server.InvalidRequestException;
 
 public class RegisterHandler {
 
