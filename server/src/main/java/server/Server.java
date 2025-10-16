@@ -47,12 +47,14 @@ public class Server {
 
         // ctx is a Context object that contains the request and the result. When you call result it sends
         // data back to the asking source
-        server.delete("db", ctx -> ctx.result("{}"));
+        server.delete("db", clearHandler::clear);
         // this::register is the same as ctx -> register(ctx)
         server.post("user", registerHandler::register);
 
         server.exception(InvalidRequestException.class, this::handleInvalidRequestException);
         server.exception(AlreadyTakenException.class, this::handleAlreadyTakenException);
+
+        server.exception(Exception.class, this::handleUncaughtException);
 
     }
 
@@ -66,12 +68,18 @@ public class Server {
     }
 
     private void handleInvalidRequestException(InvalidRequestException ex, Context ctx) {
-        var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
-        ctx.status(400).result(msg);
+        ctx.status(400).result(getErrorMessage(ex));
     }
 
     private void handleAlreadyTakenException(AlreadyTakenException ex, Context ctx) {
-        var msg = String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
-        ctx.status(403).result(msg);
+        ctx.status(403).result(getErrorMessage(ex));
+    }
+
+    private void handleUncaughtException(Exception ex, Context ctx) {
+        ctx.status(500).result(getErrorMessage(ex));
+    }
+
+    private String getErrorMessage(Exception ex) {
+        return String.format("{ \"message\": \"Error: %s\" }", ex.getMessage());
     }
 }

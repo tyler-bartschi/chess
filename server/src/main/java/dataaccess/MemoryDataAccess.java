@@ -12,6 +12,7 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public void clear() {
         users.clear();
+        auths.clear();
     }
 
     @Override
@@ -27,5 +28,10 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public void createAuth(AuthData auth) {
         auths.put(auth.username(), auth);
+    }
+
+    @Override
+    public AuthData getAuth(String username) {
+        return auths.get(username);
     }
 }

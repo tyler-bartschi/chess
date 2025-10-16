@@ -188,7 +188,6 @@ public class StandardAPITests {
 
     @Test
     @Order(9)
-    @DisplayName("Create Bad Request")
     public void createGameBadRequest() {
         TestCreateResult createResult = serverFacade.createGame(new TestCreateRequest(null), existingAuth);
 

@@ -16,6 +16,10 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
+    public void clear() {
+        dataAccess.clear();
+    }
+
     public RegisterResult register(RegisterRequest user) throws AlreadyTakenException {
         if (dataAccess.getUser(user.username()) != null) {
             throw new AlreadyTakenException("This username is already taken");
