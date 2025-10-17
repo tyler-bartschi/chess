@@ -7,6 +7,7 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import server.exceptions.*;
 import server.handlers.*;
+import service.GameService;
 import service.UserService;
 
 public class Server {
@@ -22,13 +23,14 @@ public class Server {
 
         // initialize services
         final UserService userService = new UserService(dataAccess);
+        final GameService gameService = new GameService(dataAccess);
 
         // initialize handlers
         final ClearHandler clearHandler = new ClearHandler(userService);
         final RegisterHandler registerHandler = new RegisterHandler(userService, serializer);
         final LoginHandler loginHandler = new LoginHandler(userService, serializer);
         final LogoutHandler logoutHandler = new LogoutHandler(userService);
-        final CreateGameHandler createGameHandler = new CreateGameHandler();
+        final CreateGameHandler createGameHandler = new CreateGameHandler(gameService, serializer);
         final JoinGameHandler joinGameHandler = new JoinGameHandler();
         final ListGamesHandler listGamesHandler = new ListGamesHandler();
 
@@ -40,6 +42,7 @@ public class Server {
         server.post("user", registerHandler::register);
         server.post("session", loginHandler::login);
         server.delete("session", logoutHandler::logout);
+        server.post("game", createGameHandler::createGame);
 
         server.exception(InvalidRequestException.class, this::handleInvalidRequestException);
         server.exception(UnauthorizedException.class, this::handleUnauthorizedException);

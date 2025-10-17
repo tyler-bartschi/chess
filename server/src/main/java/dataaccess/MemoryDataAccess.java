@@ -9,6 +9,7 @@ public class MemoryDataAccess implements DataAccess {
     private final HashMap<String, UserData> users = new HashMap<>();
     private final HashMap<String, AuthData> authsByUser = new HashMap<>();
     private final HashMap<String, AuthData> authsByToken = new HashMap<>();
+    private final HashMap<Integer, GameData> games = new HashMap<>();
 
     @Override
     public void clear() {
@@ -47,5 +48,15 @@ public class MemoryDataAccess implements DataAccess {
     public void deleteAuth(AuthData auth) {
         authsByUser.remove(auth.username());
         authsByToken.remove(auth.authToken());
+    }
+
+    @Override
+    public void createGame(GameData game) {
+        games.put(game.gameID(), game);
+    }
+
+    @Override
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
     }
 }

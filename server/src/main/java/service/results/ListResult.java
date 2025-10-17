@@ -4,5 +4,5 @@ import java.util.Collection;
 
 import model.GameData;
 
-public record ListResult(String status, Collection<GameData> games) {
+public record ListResult(Collection<GameData> games) {
 }

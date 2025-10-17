@@ -20,11 +20,13 @@ public class StandardServiceTests {
 
     private static DataAccess testDataAccess;
     private static UserService testUserService;
+    private static GameService testGameService;
 
     @BeforeAll
     public static void init() {
         testDataAccess = new MemoryDataAccess();
         testUserService = new UserService(testDataAccess);
+        testGameService = new GameService(testDataAccess);
         RegisterRequest request = new RegisterRequest(START_USERNAME, START_EMAIL, START_PASSWORD);
         assertDoesNotThrow(() -> testUserService.register(request), "initial register in initialization fails");
     }
@@ -113,6 +115,26 @@ public class StandardServiceTests {
 
     @Test
     @Order(9)
+    @DisplayName("Create Game Successful")
+    public void createSuccess() {
+        testDataAccess.createAuth(new AuthData("username", START_AUTH));
+        CreateRequest req = new CreateRequest(START_AUTH, "nameOfGame");
+        CreateResult res = assertDoesNotThrow(() -> testGameService.createGame(req), "Failed to create game");
+        assertInstanceOf(Integer.class, res.gameID(), "gameID is not an integer");
+        GameData obj = testDataAccess.getGame(res.gameID());
+        assertNotNull(obj, "GameData object is null");
+        assertEquals(req.gameName(), obj.gameName(), "Game name does not match");
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("Create Game Auth Failure")
+    public void createFail() {
+        assertThrows(UnauthorizedException.class, () -> testGameService.createGame(new CreateRequest("definitelyNotYourAuth", "name")));
+    }
+
+    @Test
+    @Order(11)
     @DisplayName("Clear Successful")
     public void clearSuccess() {
         testDataAccess.createAuth(new AuthData("username", START_AUTH));
