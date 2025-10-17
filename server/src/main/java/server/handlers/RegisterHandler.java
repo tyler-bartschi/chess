@@ -15,13 +15,14 @@ import service.results.RegisterResult;
 public class RegisterHandler {
 
     private final UserService userService;
+    private final Gson serializer;
 
-    public RegisterHandler(UserService userService) {
+    public RegisterHandler(UserService userService, Gson serializer) {
         this.userService = userService;
+        this.serializer = serializer;
     }
 
     public void register(Context ctx) throws InvalidRequestException, AlreadyTakenException {
-        var serializer = new Gson();
         String requestJson = ctx.body();
         checkDataValidity(serializer, requestJson);
         RegisterRequest req = serializer.fromJson(requestJson, RegisterRequest.class);

@@ -1,5 +1,6 @@
 package server;
 
+import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
 import io.javalin.*;
@@ -13,6 +14,9 @@ public class Server {
     private final Javalin server;
 
     public Server() {
+        // initialize serializer
+        Gson serializer = new Gson();
+
         // initialize dataAccess
         DataAccess dataAccess = new MemoryDataAccess();
 
@@ -21,9 +25,9 @@ public class Server {
 
         // initialize handlers
         final ClearHandler clearHandler = new ClearHandler(userService);
-        final RegisterHandler registerHandler = new RegisterHandler(userService);
-        final LoginHandler loginHandler = new LoginHandler(userService);
-        final LogoutHandler logoutHandler = new LogoutHandler();
+        final RegisterHandler registerHandler = new RegisterHandler(userService, serializer);
+        final LoginHandler loginHandler = new LoginHandler(userService, serializer);
+        final LogoutHandler logoutHandler = new LogoutHandler(userService);
         final CreateGameHandler createGameHandler = new CreateGameHandler();
         final JoinGameHandler joinGameHandler = new JoinGameHandler();
         final ListGamesHandler listGamesHandler = new ListGamesHandler();
@@ -35,6 +39,7 @@ public class Server {
         server.delete("db", clearHandler::clear);
         server.post("user", registerHandler::register);
         server.post("session", loginHandler::login);
+        server.delete("session", logoutHandler::logout);
 
         server.exception(InvalidRequestException.class, this::handleInvalidRequestException);
         server.exception(UnauthorizedException.class, this::handleUnauthorizedException);

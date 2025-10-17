@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import server.exceptions.*;
@@ -50,6 +51,15 @@ public class UserService {
         dataAccess.createAuth(newAuth);
 
         return new LoginResult(newAuth.username(), newAuth.authToken());
+    }
+
+    public SuccessEmptyResult logout(LogoutRequest req) throws UnauthorizedException {
+        AuthData authData = dataAccess.getAuthByToken(req.authToken());
+        if (authData == null) {
+            throw new UnauthorizedException("Unauthorized. Are you already logged out?");
+        }
+        dataAccess.deleteAuth(authData);
+        return new SuccessEmptyResult();
     }
 
     private String generateAuthToken() {

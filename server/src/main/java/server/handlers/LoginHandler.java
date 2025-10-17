@@ -14,13 +14,14 @@ import service.results.LoginResult;
 public class LoginHandler {
 
     private final UserService userService;
+    private final Gson serializer;
 
-    public LoginHandler(UserService userService) {
+    public LoginHandler(UserService userService, Gson serializer) {
         this.userService = userService;
+        this.serializer = serializer;
     }
 
     public void login(Context ctx) throws InvalidRequestException, UnauthorizedException {
-        var serializer = new Gson();
         String requestJson = ctx.body();
         checkDataValidity(serializer, requestJson);
 

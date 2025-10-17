@@ -7,12 +7,14 @@ import java.util.HashMap;
 public class MemoryDataAccess implements DataAccess {
 
     private final HashMap<String, UserData> users = new HashMap<>();
-    private final HashMap<String, AuthData> auths = new HashMap<>();
+    private final HashMap<String, AuthData> authsByUser = new HashMap<>();
+    private final HashMap<String, AuthData> authsByToken = new HashMap<>();
 
     @Override
     public void clear() {
         users.clear();
-        auths.clear();
+        authsByUser.clear();
+        authsByToken.clear();
     }
 
     @Override
@@ -27,11 +29,23 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public void createAuth(AuthData auth) {
-        auths.put(auth.username(), auth);
+        authsByUser.put(auth.username(), auth);
+        authsByToken.put(auth.authToken(), auth);
     }
 
     @Override
     public AuthData getAuth(String username) {
-        return auths.get(username);
+        return authsByUser.get(username);
+    }
+
+    @Override
+    public AuthData getAuthByToken(String authToken) {
+        return authsByToken.get(authToken);
+    }
+
+    @Override
+    public void deleteAuth(AuthData auth) {
+        authsByUser.remove(auth.username());
+        authsByToken.remove(auth.authToken());
     }
 }

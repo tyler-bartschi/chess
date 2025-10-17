@@ -16,6 +16,7 @@ public class StandardServiceTests {
     private final static String START_USERNAME = "existingUser";
     private final static String START_EMAIL = "existingEmail";
     private final static String START_PASSWORD = "existingPassword";
+    private final static String START_AUTH = "auth123";
 
     private static DataAccess testDataAccess;
     private static UserService testUserService;
@@ -81,12 +82,46 @@ public class StandardServiceTests {
 
     @Test
     @Order(6)
+    @DisplayName("Logout Successful")
+    public void logoutSuccess() {
+        testDataAccess.createAuth(new AuthData("username", START_AUTH));
+        LogoutRequest request = new LogoutRequest(START_AUTH);
+        SuccessEmptyResult result = assertDoesNotThrow(() -> testUserService.logout(request), "initial logout failed");
+        assertNotNull(result, "Result was null");
+        assertInstanceOf(SuccessEmptyResult.class, result, "Result was of improper type");
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("Logout Failed Bad Auth")
+    public void logoutBadAuth() {
+        testDataAccess.createAuth(new AuthData("username", START_AUTH));
+        LogoutRequest request = new LogoutRequest("definitelyNotAnAuthToken");
+        assertThrows(UnauthorizedException.class, () -> testUserService.logout(request));
+        testUserService.logout(new LogoutRequest(START_AUTH));
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("Logout Tried Multiple Times")
+    public void logoutMultiple() {
+        testDataAccess.createAuth(new AuthData("username", START_AUTH));
+        LogoutRequest req = new LogoutRequest(START_AUTH);
+        assertDoesNotThrow(() -> testUserService.logout(req), "initial logout failed");
+        assertThrows(UnauthorizedException.class, () -> testUserService.logout(req), "second logout was successful");
+    }
+
+    @Test
+    @Order(9)
     @DisplayName("Clear Successful")
     public void clearSuccess() {
+        testDataAccess.createAuth(new AuthData("username", START_AUTH));
         testUserService.clear();
         UserData noUser = testDataAccess.getUser(START_USERNAME);
         AuthData noAuth = testDataAccess.getAuth(START_USERNAME);
+        AuthData stillNoAuth = testDataAccess.getAuthByToken(START_AUTH);
         assertNull(noUser, "Did not clear the user datatable");
-        assertNull(noAuth, "Did not clear the auth datatable");
+        assertNull(noAuth, "Did not clear the authByUsername datatable");
+        assertNull(stillNoAuth, "Did not clear the authByToken datatable");
     }
 }
