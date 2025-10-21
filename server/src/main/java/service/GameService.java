@@ -9,6 +9,9 @@ import service.results.*;
 import chess.ChessGame;
 import chess.ChessGame.TeamColor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class GameService {
 
     private final DataAccess dataAccess;
@@ -17,6 +20,16 @@ public class GameService {
     public GameService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
         gamesCreated = 0;
+    }
+
+    public ListResult listGames(ListRequest req) throws UnauthorizedException {
+        verifyAuthToken(req.authToken());
+        Collection<GameData> games = dataAccess.getAllGames();
+        ArrayList<AbbrGameData> listOfGames = new ArrayList<>();
+        for (GameData game : games) {
+            listOfGames.add(new AbbrGameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
+        }
+        return new ListResult(listOfGames);
     }
 
     public SuccessEmptyResult joinGame(JoinRequest req) throws UnauthorizedException, InvalidRequestException, AlreadyTakenException {

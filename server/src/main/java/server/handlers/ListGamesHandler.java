@@ -4,9 +4,10 @@ import com.google.gson.Gson;
 import io.javalin.http.Context;
 import server.exceptions.UnauthorizedException;
 import service.GameService;
+import service.requests.ListRequest;
 import service.results.ListResult;
 
-public class ListGamesHandler {
+public class ListGamesHandler extends AuthVerificationHandler {
 
     private final GameService gameService;
     private final Gson serializer;
@@ -16,8 +17,12 @@ public class ListGamesHandler {
         this.serializer = serializer;
     }
 
-    public ListResult listGames(Context ctx) throws UnauthorizedException {
+    public void listGames(Context ctx) throws UnauthorizedException {
         String authToken = ctx.header("Authorization");
-        return null;
+        verifyAuth(authToken);
+
+        ListResult res = gameService.listGames(new ListRequest(authToken));
+
+        ctx.result(serializer.toJson(res));
     }
 }

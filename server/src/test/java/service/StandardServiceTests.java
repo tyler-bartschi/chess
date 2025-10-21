@@ -11,6 +11,8 @@ import service.requests.*;
 import service.results.*;
 import model.*;
 
+import java.util.Collection;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StandardServiceTests {
 
@@ -202,6 +204,40 @@ public class StandardServiceTests {
 
     @Test
     @Order(15)
+    @DisplayName("List Request Success")
+    public void listSuccess() {
+        testUserService.clear();
+        int gameID1 = 1234234;
+        String gameName1 = "FirstGame";
+        int gameID2 = 123414321;
+        String whiteUsername = "nomnom";
+        String gameName2 = "SecondGame";
+        testDataAccess.createAuth(new AuthData("thisWorks", START_AUTH));
+        testDataAccess.createGame(new GameData(gameID1, null, null, gameName1, new ChessGame()));
+        testDataAccess.createGame(new GameData(gameID2, whiteUsername, null, gameName2, new ChessGame()));
+
+        ListResult res = assertDoesNotThrow(() -> testGameService.listGames(new ListRequest(START_AUTH)));
+        assertNotNull(res);
+        Collection<AbbrGameData> games = res.games();
+        AbbrGameData firstGame = new AbbrGameData(gameID1, null, null, gameName1);
+        AbbrGameData secondGame = new AbbrGameData(gameID2, whiteUsername, null, gameName2);
+        assertTrue(games.contains(firstGame));
+        assertTrue(games.contains(secondGame));
+
+        AbbrGameData falseGame = new AbbrGameData(123412, "hello", "goodbye", "notAName");
+        assertFalse(games.contains(falseGame));
+    }
+
+    @Test
+    @Order(16)
+    @DisplayName("List Request Bad Auth")
+    public void listFail() {
+        testDataAccess.createAuth(new AuthData("listFail", START_AUTH));
+        assertThrows(UnauthorizedException.class, () -> testGameService.listGames(new ListRequest("Definitely not an authToken")));
+    }
+
+    @Test
+    @Order(17)
     @DisplayName("Clear Successful")
     public void clearSuccess() {
         testDataAccess.createAuth(new AuthData("username", START_AUTH));
