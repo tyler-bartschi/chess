@@ -27,7 +27,8 @@ public class JoinGameHandler extends AuthVerificationHandler {
         Map dataMap = serializer.fromJson(ctx.body(), Map.class);
         verifyData(dataMap);
 
-        JoinRequest req = new JoinRequest(authToken, dataMap.get("playerColor").toString().toUpperCase(), ((Double) dataMap.get("gameID")).intValue());
+        JoinRequest req = new JoinRequest(authToken, dataMap.get("playerColor").toString().toUpperCase(),
+                ((Double) dataMap.get("gameID")).intValue());
         SuccessEmptyResult res = gameService.joinGame(req);
 
         ctx.result(serializer.toJson(res));

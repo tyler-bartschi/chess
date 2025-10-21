@@ -73,7 +73,8 @@ public class StandardServiceTests {
     @DisplayName("Login Bad Password")
     public void loginBadPass() {
         LoginRequest request = new LoginRequest(START_USERNAME, "notPassword");
-        assertThrows(UnauthorizedException.class, () -> testUserService.login(request), "Does not throw an unauthorized exception for invalid password");
+        assertThrows(UnauthorizedException.class, () -> testUserService.login(request),
+                "Does not throw an unauthorized exception for invalid password");
 
     }
 
@@ -82,7 +83,8 @@ public class StandardServiceTests {
     @DisplayName("Login Invalid Username")
     public void loginBadUser() {
         LoginRequest request = new LoginRequest("nonExistentUser", "123");
-        assertThrows(UnauthorizedException.class, () -> testUserService.login(request), "Does not throw an unauthorized exception for invalid username");
+        assertThrows(UnauthorizedException.class, () -> testUserService.login(request),
+                "Does not throw an unauthorized exception for invalid username");
     }
 
     @Test
