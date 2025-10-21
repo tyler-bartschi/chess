@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.*;
+import chess.ChessGame.TeamColor;
 
 public interface DataAccess {
     void clear();
@@ -20,4 +21,6 @@ public interface DataAccess {
     void createGame(GameData game);
 
     GameData getGame(int gameID);
+
+    void updateGame(int gameID, GameData game);
 }

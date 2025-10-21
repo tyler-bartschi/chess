@@ -4,6 +4,8 @@ import model.*;
 
 import java.util.HashMap;
 
+import chess.ChessGame.TeamColor;
+
 public class MemoryDataAccess implements DataAccess {
 
     private final HashMap<String, UserData> users = new HashMap<>();
@@ -16,6 +18,7 @@ public class MemoryDataAccess implements DataAccess {
         users.clear();
         authsByUser.clear();
         authsByToken.clear();
+        games.clear();
     }
 
     @Override
@@ -58,5 +61,10 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public GameData getGame(int gameID) {
         return games.get(gameID);
+    }
+
+    @Override
+    public void updateGame(int gameID, GameData game) {
+        games.put(gameID, game);
     }
 }

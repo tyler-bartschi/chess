@@ -22,9 +22,7 @@ public class CreateGameHandler {
 
     public void createGame(Context ctx) throws InvalidRequestException, UnauthorizedException {
         String authToken = ctx.header("Authorization");
-        if (authToken == null || authToken.isEmpty()) {
-            throw new UnauthorizedException("Unauthorized.");
-        }
+        verifyAuth(authToken);
 
         Map gameNameMap = serializer.fromJson(ctx.body(), Map.class);
         verifyData(gameNameMap);
@@ -34,8 +32,14 @@ public class CreateGameHandler {
     }
 
     private void verifyData(Map gameNameMap) throws InvalidRequestException {
-        if (gameNameMap.get("gameName") == null || gameNameMap.get("gameName") == "") {
+        if (gameNameMap.get("gameName") == null || gameNameMap.get("gameName").toString().isEmpty()) {
             throw new InvalidRequestException("Must provide a game name");
+        }
+    }
+
+    private void verifyAuth(String authToken) throws UnauthorizedException {
+        if (authToken == null || authToken.isEmpty()) {
+            throw new UnauthorizedException("Unauthorized.");
         }
     }
 }

@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -135,15 +136,84 @@ public class StandardServiceTests {
 
     @Test
     @Order(11)
+    @DisplayName("Join Game Success")
+    public void joinSuccess() {
+        String authToken = "authDJ2";
+        String user1 = "joinUser";
+        String user2 = "twoUser";
+        testDataAccess.createAuth(new AuthData(user1, START_AUTH));
+        testDataAccess.createAuth(new AuthData(user2, authToken));
+        CreateResult cRes = testGameService.createGame(new CreateRequest(START_AUTH, "joinGameSuccess"));
+        int gameID = cRes.gameID();
+
+        JoinRequest req1 = new JoinRequest(START_AUTH, "WHITE", gameID);
+        JoinRequest req2 = new JoinRequest(authToken, "BLACK", gameID);
+
+        assertDoesNotThrow(() -> testGameService.joinGame(req1));
+        assertDoesNotThrow(() -> testGameService.joinGame(req2));
+
+        GameData game = testDataAccess.getGame(gameID);
+        assertEquals(user1, game.whiteUsername(), "White username does not match");
+        assertEquals(user2, game.blackUsername(), "Black username does not match");
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("Join Game Bad Request")
+    public void joinBadReq() {
+        testDataAccess.createAuth(new AuthData("myUser", START_AUTH));
+        CreateResult cRes = testGameService.createGame(new CreateRequest(START_AUTH, "joinGameBad"));
+        int gameID = cRes.gameID();
+
+        JoinRequest req = new JoinRequest(START_AUTH, "WHITE", -2314781);
+        assertThrows(InvalidRequestException.class, () -> testGameService.joinGame(req), "Invalid request went through");
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("Join Game Unauthorized")
+    public void joinUnauthorized() {
+        testDataAccess.createAuth(new AuthData("myUser", START_AUTH));
+        CreateResult cRes = testGameService.createGame(new CreateRequest(START_AUTH, "joinGameBad"));
+        int gameID = cRes.gameID();
+
+        JoinRequest req = new JoinRequest("I'm Unauthorized!", "BLACK", gameID);
+        assertThrows(UnauthorizedException.class, () -> testGameService.joinGame(req), "Unauthorized user was able to join game");
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("Join Game Already Taken")
+    public void joinAlreadyTaken() {
+        String authToken = "authDJ2";
+        String user1 = "joinUser";
+        String user2 = "twoUser";
+        testDataAccess.createAuth(new AuthData(user1, START_AUTH));
+        testDataAccess.createAuth(new AuthData(user2, authToken));
+        CreateResult cRes = testGameService.createGame(new CreateRequest(START_AUTH, "joinGameSuccess"));
+        int gameID = cRes.gameID();
+
+        JoinRequest req1 = new JoinRequest(START_AUTH, "WHITE", gameID);
+        JoinRequest req2 = new JoinRequest(authToken, "WHITE", gameID);
+
+        assertDoesNotThrow(() -> testGameService.joinGame(req1));
+        assertThrows(AlreadyTakenException.class, () -> testGameService.joinGame(req2), "Second user was able to join as the same color");
+    }
+
+    @Test
+    @Order(15)
     @DisplayName("Clear Successful")
     public void clearSuccess() {
         testDataAccess.createAuth(new AuthData("username", START_AUTH));
+        testDataAccess.createGame(new GameData(1234, null, null, "testGame", new ChessGame()));
         testUserService.clear();
         UserData noUser = testDataAccess.getUser(START_USERNAME);
         AuthData noAuth = testDataAccess.getAuth(START_USERNAME);
         AuthData stillNoAuth = testDataAccess.getAuthByToken(START_AUTH);
+        GameData noGame = testDataAccess.getGame(1234);
         assertNull(noUser, "Did not clear the user datatable");
         assertNull(noAuth, "Did not clear the authByUsername datatable");
         assertNull(stillNoAuth, "Did not clear the authByToken datatable");
+        assertNull(noGame, "Did not clear the games datatable");
     }
 }

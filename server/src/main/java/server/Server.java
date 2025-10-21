@@ -31,7 +31,7 @@ public class Server {
         final LoginHandler loginHandler = new LoginHandler(userService, serializer);
         final LogoutHandler logoutHandler = new LogoutHandler(userService);
         final CreateGameHandler createGameHandler = new CreateGameHandler(gameService, serializer);
-        final JoinGameHandler joinGameHandler = new JoinGameHandler();
+        final JoinGameHandler joinGameHandler = new JoinGameHandler(gameService, serializer);
         final ListGamesHandler listGamesHandler = new ListGamesHandler();
 
 
@@ -43,6 +43,7 @@ public class Server {
         server.post("session", loginHandler::login);
         server.delete("session", logoutHandler::logout);
         server.post("game", createGameHandler::createGame);
+        server.put("game", joinGameHandler::joinGame);
 
         server.exception(InvalidRequestException.class, this::handleInvalidRequestException);
         server.exception(UnauthorizedException.class, this::handleUnauthorizedException);

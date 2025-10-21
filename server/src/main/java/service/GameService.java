@@ -7,6 +7,7 @@ import server.exceptions.*;
 import service.requests.*;
 import service.results.*;
 import chess.ChessGame;
+import chess.ChessGame.TeamColor;
 
 public class GameService {
 
@@ -18,11 +19,46 @@ public class GameService {
         gamesCreated = 0;
     }
 
+    public SuccessEmptyResult joinGame(JoinRequest req) throws UnauthorizedException, InvalidRequestException, AlreadyTakenException {
+        verifyAuthToken(req.authToken());
+        String username = dataAccess.getAuthByToken(req.authToken()).username();
+
+        TeamColor teamColor = req.playerColor().equals("WHITE") ? TeamColor.WHITE : TeamColor.BLACK;
+
+        GameData existingGame = dataAccess.getGame(req.gameID());
+        if (existingGame == null) {
+            throw new InvalidRequestException("No game by that gameID");
+        }
+        if (teamColor == TeamColor.WHITE) {
+            setWhiteUsername(username, existingGame);
+        } else {
+            setBlackUsername(username, existingGame);
+        }
+
+        return new SuccessEmptyResult();
+    }
+
     public CreateResult createGame(CreateRequest req) throws UnauthorizedException {
         verifyAuthToken(req.authToken());
         GameData game = createGameData(req.gameName());
         dataAccess.createGame(game);
         return new CreateResult(game.gameID());
+    }
+
+    private void setWhiteUsername(String username, GameData existingGame) throws AlreadyTakenException {
+        if (existingGame.whiteUsername() != null) {
+            throw new AlreadyTakenException("White player already taken");
+        }
+        dataAccess.updateGame(existingGame.gameID(), new GameData(existingGame.gameID(), username, existingGame.blackUsername(),
+                existingGame.gameName(), existingGame.game()));
+    }
+
+    private void setBlackUsername(String username, GameData existingGame) throws AlreadyTakenException {
+        if (existingGame.blackUsername() != null) {
+            throw new AlreadyTakenException("Black player already taken");
+        }
+        dataAccess.updateGame(existingGame.gameID(), new GameData(existingGame.gameID(), existingGame.whiteUsername(), username,
+                existingGame.gameName(), existingGame.game()));
     }
 
     private void verifyAuthToken(String authToken) throws UnauthorizedException {
