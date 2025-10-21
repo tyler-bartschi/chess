@@ -10,7 +10,7 @@ import service.results.CreateResult;
 
 import java.util.Map;
 
-public class CreateGameHandler {
+public class CreateGameHandler extends AuthVerificationHandler {
 
     private final GameService gameService;
     private final Gson serializer;
@@ -34,12 +34,6 @@ public class CreateGameHandler {
     private void verifyData(Map gameNameMap) throws InvalidRequestException {
         if (gameNameMap.get("gameName") == null || gameNameMap.get("gameName").toString().isEmpty()) {
             throw new InvalidRequestException("Must provide a game name");
-        }
-    }
-
-    private void verifyAuth(String authToken) throws UnauthorizedException {
-        if (authToken == null || authToken.isEmpty()) {
-            throw new UnauthorizedException("Unauthorized.");
         }
     }
 }

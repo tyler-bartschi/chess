@@ -10,7 +10,7 @@ import java.util.Map;
 import service.requests.JoinRequest;
 import service.results.SuccessEmptyResult;
 
-public class JoinGameHandler {
+public class JoinGameHandler extends AuthVerificationHandler {
 
     private final GameService gameService;
     private final Gson serializer;
@@ -32,12 +32,6 @@ public class JoinGameHandler {
 
         ctx.result(serializer.toJson(res));
 
-    }
-
-    private void verifyAuth(String authToken) throws UnauthorizedException {
-        if (authToken == null || authToken.isEmpty()) {
-            throw new UnauthorizedException("No authentication provided");
-        }
     }
 
     private void verifyData(Map dataMap) throws InvalidRequestException {

@@ -1,7 +1,8 @@
 package dataaccess;
 
 import model.*;
-import chess.ChessGame.TeamColor;
+
+import java.util.Collection;
 
 public interface DataAccess {
     void clear();
@@ -23,4 +24,6 @@ public interface DataAccess {
     GameData getGame(int gameID);
 
     void updateGame(int gameID, GameData game);
+
+    Collection<GameData> getAllGames();
 }

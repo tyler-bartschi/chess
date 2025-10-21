@@ -3,8 +3,8 @@ package dataaccess;
 import model.*;
 
 import java.util.HashMap;
-
-import chess.ChessGame.TeamColor;
+import java.util.Collection;
+import java.util.ArrayList;
 
 public class MemoryDataAccess implements DataAccess {
 
@@ -66,5 +66,10 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public void updateGame(int gameID, GameData game) {
         games.put(gameID, game);
+    }
+
+    @Override
+    public Collection<GameData> getAllGames() {
+        return games.values();
     }
 }
