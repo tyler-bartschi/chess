@@ -14,11 +14,9 @@ import java.util.Collection;
 public class GameService {
 
     private final DataAccess dataAccess;
-    private int gamesCreated;
 
     public GameService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
-        gamesCreated = 0;
     }
 
     public ListResult listGames(ListRequest req) throws UnauthorizedException {
@@ -52,16 +50,16 @@ public class GameService {
 
     public CreateResult createGame(CreateRequest req) throws UnauthorizedException {
         verifyAuthToken(req.authToken());
-        GameData game = createGameData(req.gameName());
-        dataAccess.createGame(game);
-        return new CreateResult(game.gameID());
+        GameDataNoID game = createGameData(req.gameName());
+        GameData createdGame = dataAccess.createGame(game);
+        return new CreateResult(createdGame.gameID());
     }
 
     private void setWhiteUsername(String username, GameData existingGame) throws AlreadyTakenException {
         if (existingGame.whiteUsername() != null) {
             throw new AlreadyTakenException("White player already taken");
         }
-        dataAccess.joinGame(existingGame.gameID(), new GameData(existingGame.gameID(), username, existingGame.blackUsername(),
+        dataAccess.updateGame(existingGame.gameID(), new GameData(existingGame.gameID(), username, existingGame.blackUsername(),
                 existingGame.gameName(), existingGame.game()));
     }
 
@@ -69,7 +67,7 @@ public class GameService {
         if (existingGame.blackUsername() != null) {
             throw new AlreadyTakenException("Black player already taken");
         }
-        dataAccess.joinGame(existingGame.gameID(), new GameData(existingGame.gameID(), existingGame.whiteUsername(), username,
+        dataAccess.updateGame(existingGame.gameID(), new GameData(existingGame.gameID(), existingGame.whiteUsername(), username,
                 existingGame.gameName(), existingGame.game()));
     }
 
@@ -80,20 +78,7 @@ public class GameService {
         }
     }
 
-    private GameData createGameData(String gameName) {
-        int gameID = generateValidGameID();
-        return new GameData(gameID, null, null, gameName, new ChessGame());
-    }
-
-    private int generateValidGameID() {
-        gamesCreated++;
-        int gameID = gamesCreated;
-        GameData possibleGame = dataAccess.getGame(gameID);
-        while (possibleGame != null) {
-            gamesCreated++;
-            gameID = gamesCreated;
-            possibleGame = dataAccess.getGame(gameID);
-        }
-        return gameID;
+    private GameDataNoID createGameData(String gameName) {
+        return new GameDataNoID(null, null, gameName, new ChessGame());
     }
 }

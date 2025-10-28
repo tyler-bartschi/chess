@@ -13,6 +13,12 @@ public class MemoryDataAccess implements DataAccess {
     private final HashMap<String, AuthData> authsByToken = new HashMap<>();
     private final HashMap<Integer, GameData> games = new HashMap<>();
 
+    private int gamesCreated;
+
+    public MemoryDataAccess() {
+        gamesCreated = 0;
+    }
+
     @Override
     public void clear() {
         users.clear();
@@ -22,7 +28,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void createUser(UserData user) {
+    public void createUser(UserData user) throws DataAccessException {
         users.put(user.username(), user);
     }
 
@@ -32,7 +38,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void createAuth(AuthData auth) {
+    public void createAuth(AuthData auth) throws DataAccessException {
         authsByUser.put(auth.username(), auth);
         authsByToken.put(auth.authToken(), auth);
     }
@@ -54,8 +60,11 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void createGame(GameData game) {
-        games.put(game.gameID(), game);
+    public GameData createGame(GameDataNoID newGame) throws DataAccessException {
+        int gameID = generateValidGameID();
+        GameData game = new GameData(gameID, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
+        games.put(gameID, game);
+        return game;
     }
 
     @Override
@@ -64,7 +73,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void joinGame(int gameID, GameData game) {
+    public void updateGame(int gameID, GameData game) throws DataAccessException {
         games.put(gameID, game);
     }
 
@@ -72,4 +81,22 @@ public class MemoryDataAccess implements DataAccess {
     public Collection<GameData> getAllGames() {
         return games.values();
     }
+
+    @Override
+    public void createGameWithID(GameData game) throws DataAccessException {
+        games.put(game.gameID(), game);
+    }
+
+    private int generateValidGameID() {
+        gamesCreated++;
+        int gameID = gamesCreated;
+        GameData possibleGame = getGame(gameID);
+        while (possibleGame != null) {
+            gamesCreated++;
+            gameID = gamesCreated;
+            possibleGame = getGame(gameID);
+        }
+        return gameID;
+    }
+
 }

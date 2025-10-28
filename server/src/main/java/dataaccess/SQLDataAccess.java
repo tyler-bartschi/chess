@@ -1,8 +1,6 @@
 package dataaccess;
 
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import model.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -55,8 +53,8 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void createGame(GameData game) {
-
+    public GameData createGame(GameDataNoID game) {
+        return null;
     }
 
     @Override
@@ -65,7 +63,12 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void joinGame(int gameID, GameData game) {
+    public void updateGame(int gameID, GameData game) {
+
+    }
+
+    @Override
+    public void createGameWithID(GameData game) throws DataAccessException {
 
     }
 

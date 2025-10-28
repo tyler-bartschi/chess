@@ -19,11 +19,13 @@ public interface DataAccess {
 
     void deleteAuth(AuthData auth) throws DataAccessException;
 
-    void createGame(GameData game) throws DataAccessException;
+    GameData createGame(GameDataNoID game) throws DataAccessException;
 
     GameData getGame(int gameID);
 
-    void joinGame(int gameID, GameData game) throws DataAccessException;
+    void updateGame(int gameID, GameData game) throws DataAccessException;
 
     Collection<GameData> getAllGames();
+
+    void createGameWithID(GameData game) throws DataAccessException;
 }
