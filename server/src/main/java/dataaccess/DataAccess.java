@@ -23,6 +23,8 @@ public interface DataAccess {
 
     GameData getGame(int gameID);
 
+    void joinGame(int gameID, GameData game);
+
     void updateGame(int gameID, GameData game);
 
     Collection<GameData> getAllGames();

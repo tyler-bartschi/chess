@@ -17,7 +17,6 @@ public class SQLDataAccess implements DataAccess {
             System.out.println("Failure to create database or tables");
             throw new RuntimeException("Failure to create database or tables.");
         }
-
     }
 
     @Override
@@ -63,6 +62,11 @@ public class SQLDataAccess implements DataAccess {
     @Override
     public GameData getGame(int gameID) {
         return null;
+    }
+
+    @Override
+    public void joinGame(int gameID, GameData game) {
+
     }
 
     @Override

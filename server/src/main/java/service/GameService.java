@@ -1,7 +1,6 @@
 package service;
 
 import dataaccess.DataAccess;
-import io.javalin.http.Context;
 import model.*;
 import server.exceptions.*;
 import service.requests.*;
@@ -62,7 +61,7 @@ public class GameService {
         if (existingGame.whiteUsername() != null) {
             throw new AlreadyTakenException("White player already taken");
         }
-        dataAccess.updateGame(existingGame.gameID(), new GameData(existingGame.gameID(), username, existingGame.blackUsername(),
+        dataAccess.joinGame(existingGame.gameID(), new GameData(existingGame.gameID(), username, existingGame.blackUsername(),
                 existingGame.gameName(), existingGame.game()));
     }
 
@@ -70,7 +69,7 @@ public class GameService {
         if (existingGame.blackUsername() != null) {
             throw new AlreadyTakenException("Black player already taken");
         }
-        dataAccess.updateGame(existingGame.gameID(), new GameData(existingGame.gameID(), existingGame.whiteUsername(), username,
+        dataAccess.joinGame(existingGame.gameID(), new GameData(existingGame.gameID(), existingGame.whiteUsername(), username,
                 existingGame.gameName(), existingGame.game()));
     }
 
