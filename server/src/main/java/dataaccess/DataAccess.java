@@ -7,25 +7,23 @@ import java.util.Collection;
 public interface DataAccess {
     void clear();
 
-    void createUser(UserData user);
+    void createUser(UserData user) throws DataAccessException;
 
     UserData getUser(String username);
 
-    void createAuth(AuthData auth);
+    void createAuth(AuthData auth) throws DataAccessException;
 
     AuthData getAuth(String username);
 
     AuthData getAuthByToken(String authToken);
 
-    void deleteAuth(AuthData auth);
+    void deleteAuth(AuthData auth) throws DataAccessException;
 
-    void createGame(GameData game);
+    void createGame(GameData game) throws DataAccessException;
 
     GameData getGame(int gameID);
 
-    void joinGame(int gameID, GameData game);
-
-    void updateGame(int gameID, GameData game);
+    void joinGame(int gameID, GameData game) throws DataAccessException;
 
     Collection<GameData> getAllGames();
 }

@@ -70,11 +70,6 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame(int gameID, GameData game) {
-
-    }
-
-    @Override
     public Collection<GameData> getAllGames() {
         return List.of();
     }

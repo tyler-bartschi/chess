@@ -69,11 +69,6 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame(int gameID, GameData game) {
-        return;
-    }
-
-    @Override
     public Collection<GameData> getAllGames() {
         return games.values();
     }
