@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import server.exceptions.InvalidRequestException;
 import server.exceptions.UnauthorizedException;
@@ -20,7 +21,7 @@ public class CreateGameHandler extends AuthVerificationHandler {
         this.serializer = serializer;
     }
 
-    public void createGame(Context ctx) throws InvalidRequestException, UnauthorizedException {
+    public void createGame(Context ctx) throws InvalidRequestException, UnauthorizedException, DataAccessException {
         String authToken = ctx.header("Authorization");
         verifyAuth(authToken);
 

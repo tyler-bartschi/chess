@@ -91,7 +91,7 @@ public class StandardServiceTests {
     @Order(6)
     @DisplayName("Logout Successful")
     public void logoutSuccess() {
-        testDataAccess.createAuth(new AuthData("username", START_AUTH));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("username", START_AUTH)));
         LogoutRequest request = new LogoutRequest(START_AUTH);
         SuccessEmptyResult result = assertDoesNotThrow(() -> testUserService.logout(request), "initial logout failed");
         assertNotNull(result, "Result was null");
@@ -102,7 +102,7 @@ public class StandardServiceTests {
     @Order(7)
     @DisplayName("Logout Failed Bad Auth")
     public void logoutBadAuth() {
-        testDataAccess.createAuth(new AuthData("username", START_AUTH));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("username", START_AUTH)));
         LogoutRequest request = new LogoutRequest("definitelyNotAnAuthToken");
         assertThrows(UnauthorizedException.class, () -> testUserService.logout(request));
         assertDoesNotThrow(() -> testUserService.logout(new LogoutRequest(START_AUTH)));
@@ -112,7 +112,7 @@ public class StandardServiceTests {
     @Order(8)
     @DisplayName("Logout Tried Multiple Times")
     public void logoutMultiple() {
-        testDataAccess.createAuth(new AuthData("username", START_AUTH));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("username", START_AUTH)));
         LogoutRequest req = new LogoutRequest(START_AUTH);
         assertDoesNotThrow(() -> testUserService.logout(req), "initial logout failed");
         assertThrows(UnauthorizedException.class, () -> testUserService.logout(req), "second logout was successful");
@@ -122,7 +122,7 @@ public class StandardServiceTests {
     @Order(9)
     @DisplayName("Create Game Successful")
     public void createSuccess() {
-        testDataAccess.createAuth(new AuthData("username", START_AUTH));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("username", START_AUTH)));
         CreateRequest req = new CreateRequest(START_AUTH, "nameOfGame");
         CreateResult res = assertDoesNotThrow(() -> testGameService.createGame(req), "Failed to create game");
         assertInstanceOf(Integer.class, res.gameID(), "gameID is not an integer");
@@ -145,8 +145,8 @@ public class StandardServiceTests {
         String authToken = "authDJ2";
         String user1 = "joinUser";
         String user2 = "twoUser";
-        testDataAccess.createAuth(new AuthData(user1, START_AUTH));
-        testDataAccess.createAuth(new AuthData(user2, authToken));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData(user1, START_AUTH)));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData(user2, authToken)));
         CreateResult cRes = assertDoesNotThrow(() ->testGameService.createGame(new CreateRequest(START_AUTH, "joinGameSuccess")));
         int gameID = cRes.gameID();
 
@@ -165,7 +165,7 @@ public class StandardServiceTests {
     @Order(12)
     @DisplayName("Join Game Bad Request")
     public void joinBadReq() {
-        testDataAccess.createAuth(new AuthData("myUser", START_AUTH));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("myUser", START_AUTH)));
         CreateResult cRes = assertDoesNotThrow(() ->testGameService.createGame(new CreateRequest(START_AUTH, "joinGameBad")));
         int gameID = cRes.gameID();
 
@@ -177,7 +177,7 @@ public class StandardServiceTests {
     @Order(13)
     @DisplayName("Join Game Unauthorized")
     public void joinUnauthorized() {
-        testDataAccess.createAuth(new AuthData("myUser", START_AUTH));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("myUser", START_AUTH)));
         CreateResult cRes = assertDoesNotThrow(() -> testGameService.createGame(new CreateRequest(START_AUTH, "joinGameBad")));
         int gameID = cRes.gameID();
 
@@ -192,8 +192,8 @@ public class StandardServiceTests {
         String authToken = "authDJ2";
         String user1 = "joinUser";
         String user2 = "twoUser";
-        testDataAccess.createAuth(new AuthData(user1, START_AUTH));
-        testDataAccess.createAuth(new AuthData(user2, authToken));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData(user1, START_AUTH)));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData(user2, authToken)));
         CreateResult cRes = assertDoesNotThrow(() ->testGameService.createGame(new CreateRequest(START_AUTH, "joinGameSuccess")));
         int gameID = cRes.gameID();
 
@@ -214,9 +214,9 @@ public class StandardServiceTests {
         int gameID2 = 123414321;
         String whiteUsername = "nomnom";
         String gameName2 = "SecondGame";
-        testDataAccess.createAuth(new AuthData("thisWorks", START_AUTH));
-        testDataAccess.createGameWithID(new GameData(gameID1, null, null, gameName1, new ChessGame()));
-        testDataAccess.createGameWithID(new GameData(gameID2, whiteUsername, null, gameName2, new ChessGame()));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("thisWorks", START_AUTH)));
+        assertDoesNotThrow(() -> testDataAccess.createGameWithID(new GameData(gameID1, null, null, gameName1, new ChessGame())));
+        assertDoesNotThrow(() -> testDataAccess.createGameWithID(new GameData(gameID2, whiteUsername, null, gameName2, new ChessGame())));
 
         ListResult res = assertDoesNotThrow(() -> testGameService.listGames(new ListRequest(START_AUTH)));
         assertNotNull(res);
@@ -234,7 +234,7 @@ public class StandardServiceTests {
     @Order(16)
     @DisplayName("List Request Bad Auth")
     public void listFail() {
-        testDataAccess.createAuth(new AuthData("listFail", START_AUTH));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("listFail", START_AUTH)));
         assertThrows(UnauthorizedException.class, () -> testGameService.listGames(new ListRequest("Definitely not an authToken")));
     }
 
@@ -242,8 +242,8 @@ public class StandardServiceTests {
     @Order(17)
     @DisplayName("Clear Successful")
     public void clearSuccess() {
-        testDataAccess.createAuth(new AuthData("username", START_AUTH));
-        testDataAccess.createGameWithID(new GameData(1234, null, null, "testGame", new ChessGame()));
+        assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("username", START_AUTH)));
+        assertDoesNotThrow(() -> testDataAccess.createGameWithID(new GameData(1234, null, null, "testGame", new ChessGame())));
         testUserService.clear();
         UserData noUser = testDataAccess.getUser(START_USERNAME);
         AuthData noAuth = testDataAccess.getAuth(START_USERNAME);

@@ -1,5 +1,6 @@
 package server.handlers;
 
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import server.exceptions.UnauthorizedException;
 import service.UserService;
@@ -14,7 +15,7 @@ public class LogoutHandler {
         this.userService = userService;
     }
 
-    public void logout(Context ctx) throws UnauthorizedException {
+    public void logout(Context ctx) throws UnauthorizedException, DataAccessException {
         String authToken = ctx.header("Authorization");
         if (authToken == null || authToken.isEmpty()) {
             throw new UnauthorizedException("Unauthorized. Are you already logged out?");

@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import server.exceptions.*;
@@ -22,7 +23,7 @@ public class UserService {
         dataAccess.clear();
     }
 
-    public RegisterResult register(RegisterRequest user) throws AlreadyTakenException {
+    public RegisterResult register(RegisterRequest user) throws AlreadyTakenException, DataAccessException {
         if (dataAccess.getUser(user.username()) != null) {
             throw new AlreadyTakenException("This username is already taken");
         }
@@ -37,7 +38,7 @@ public class UserService {
         return new RegisterResult(newAuth.username(), newAuth.authToken());
     }
 
-    public LoginResult login(LoginRequest req) throws UnauthorizedException {
+    public LoginResult login(LoginRequest req) throws UnauthorizedException, DataAccessException {
         UserData user = dataAccess.getUser(req.username());
         if (user == null) {
             throw new UnauthorizedException("unauthorized -- invalid username or password");
@@ -52,7 +53,7 @@ public class UserService {
         return new LoginResult(newAuth.username(), newAuth.authToken());
     }
 
-    public SuccessEmptyResult logout(LogoutRequest req) throws UnauthorizedException {
+    public SuccessEmptyResult logout(LogoutRequest req) throws UnauthorizedException, DataAccessException {
         AuthData authData = dataAccess.getAuthByToken(req.authToken());
         if (authData == null) {
             throw new UnauthorizedException("Unauthorized. Are you already logged out?");

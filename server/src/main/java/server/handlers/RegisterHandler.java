@@ -3,6 +3,7 @@ package server.handlers;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 
 import server.exceptions.AlreadyTakenException;
@@ -22,7 +23,7 @@ public class RegisterHandler {
         this.serializer = serializer;
     }
 
-    public void register(Context ctx) throws InvalidRequestException, AlreadyTakenException {
+    public void register(Context ctx) throws InvalidRequestException, AlreadyTakenException, DataAccessException {
         String requestJson = ctx.body();
         checkDataValidity(serializer, requestJson);
         RegisterRequest req = serializer.fromJson(requestJson, RegisterRequest.class);

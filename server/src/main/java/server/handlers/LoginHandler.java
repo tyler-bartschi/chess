@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import server.exceptions.*;
 
@@ -21,7 +22,7 @@ public class LoginHandler {
         this.serializer = serializer;
     }
 
-    public void login(Context ctx) throws InvalidRequestException, UnauthorizedException {
+    public void login(Context ctx) throws InvalidRequestException, UnauthorizedException, DataAccessException {
         String requestJson = ctx.body();
         checkDataValidity(serializer, requestJson);
 

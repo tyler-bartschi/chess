@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import model.*;
 import server.exceptions.*;
 import service.requests.*;
@@ -29,7 +30,7 @@ public class GameService {
         return new ListResult(listOfGames);
     }
 
-    public SuccessEmptyResult joinGame(JoinRequest req) throws UnauthorizedException, InvalidRequestException, AlreadyTakenException {
+    public SuccessEmptyResult joinGame(JoinRequest req) throws UnauthorizedException, InvalidRequestException, AlreadyTakenException, DataAccessException {
         verifyAuthToken(req.authToken());
         String username = dataAccess.getAuthByToken(req.authToken()).username();
 
@@ -48,14 +49,14 @@ public class GameService {
         return new SuccessEmptyResult();
     }
 
-    public CreateResult createGame(CreateRequest req) throws UnauthorizedException {
+    public CreateResult createGame(CreateRequest req) throws UnauthorizedException, DataAccessException {
         verifyAuthToken(req.authToken());
         GameDataNoID game = createGameData(req.gameName());
         GameData createdGame = dataAccess.createGame(game);
         return new CreateResult(createdGame.gameID());
     }
 
-    private void setWhiteUsername(String username, GameData existingGame) throws AlreadyTakenException {
+    private void setWhiteUsername(String username, GameData existingGame) throws AlreadyTakenException, DataAccessException {
         if (existingGame.whiteUsername() != null) {
             throw new AlreadyTakenException("White player already taken");
         }
@@ -63,7 +64,7 @@ public class GameService {
                 existingGame.gameName(), existingGame.game()));
     }
 
-    private void setBlackUsername(String username, GameData existingGame) throws AlreadyTakenException {
+    private void setBlackUsername(String username, GameData existingGame) throws AlreadyTakenException, DataAccessException {
         if (existingGame.blackUsername() != null) {
             throw new AlreadyTakenException("Black player already taken");
         }

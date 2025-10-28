@@ -80,6 +80,7 @@ public class Server {
     }
 
     private void handleUncaughtException(Exception ex, Context ctx) {
+        // this also handles DataAccessExceptions, which are an internal server error
         ctx.status(500).result(getErrorMessage(ex));
     }
 

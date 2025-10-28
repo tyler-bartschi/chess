@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import service.GameService;
 import server.exceptions.*;
@@ -20,7 +21,7 @@ public class JoinGameHandler extends AuthVerificationHandler {
         this.serializer = serializer;
     }
 
-    public void joinGame(Context ctx) throws InvalidRequestException, AlreadyTakenException, UnauthorizedException {
+    public void joinGame(Context ctx) throws InvalidRequestException, AlreadyTakenException, UnauthorizedException, DataAccessException {
         String authToken = ctx.header("Authorization");
         verifyAuth(authToken);
 
