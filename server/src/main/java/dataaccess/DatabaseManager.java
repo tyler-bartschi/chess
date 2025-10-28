@@ -9,6 +9,39 @@ public class DatabaseManager {
     private static String dbPassword;
     private static String connectionUrl;
 
+    private final static String[] tables = {
+            """
+            CREATE TABLE IF NOT EXISTS users (
+            id int NOT NULL AUTO_INCREMENT,
+            username VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            PRIMARY KEY(id),
+            INDEX(username)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS auth (
+            id int NOT NULL AUTO_INCREMENT,
+            authToken VARCHAR(255) NOT NULL,
+            username VARCHAR(255) NOT NULL,
+            PRIMARY KEY(id),
+            INDEX(authToken),
+            INDEX(username)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS games (
+            id int NOT NULL AUTO_INCREMENT,
+            whiteUsername VARCHAR(255) DEFAULT NULL,
+            blackUsername VARCHAR(255) DEFAULT NULL,
+            gameName VARCHAR(255) NOT NULL,
+            game TEXT NOT NULL,
+            PRIMARY KEY(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
+
     /*
      * Load the database information for the db.properties file.
      */
@@ -26,6 +59,18 @@ public class DatabaseManager {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
             throw new DataAccessException("failed to create database", ex);
+        }
+    }
+
+    static public void createTables() throws DataAccessException {
+        for (String table : tables) {
+            try (var conn = DatabaseManager.getConnection();
+                 var preparedStatement = conn.prepareStatement(table)) {
+                preparedStatement.executeUpdate();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                throw new DataAccessException("failed to create tables", ex);
+            }
         }
     }
 

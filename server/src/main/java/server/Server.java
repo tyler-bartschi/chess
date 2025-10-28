@@ -2,7 +2,9 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.SQLDataAccess;
 import io.javalin.*;
 import io.javalin.http.Context;
 import server.exceptions.*;
@@ -18,8 +20,10 @@ public class Server {
         // initialize serializer
         Gson serializer = new Gson();
 
+
         // initialize dataAccess
-        DataAccess dataAccess = new MemoryDataAccess();
+        DataAccess dataAccess = new SQLDataAccess();
+
 
         // initialize services
         final UserService userService = new UserService(dataAccess);
