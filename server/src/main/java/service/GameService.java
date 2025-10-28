@@ -53,6 +53,9 @@ public class GameService {
         verifyAuthToken(req.authToken());
         GameDataNoID game = createGameData(req.gameName());
         GameData createdGame = dataAccess.createGame(game);
+        if (createdGame == null) {
+            throw new DataAccessException("Failed to create the game");
+        }
         return new CreateResult(createdGame.gameID());
     }
 

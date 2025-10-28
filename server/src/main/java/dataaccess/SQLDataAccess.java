@@ -23,7 +23,7 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void createUser(UserData user) {
+    public void createUser(UserData user) throws DataAccessException {
 
     }
 
@@ -33,7 +33,7 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void createAuth(AuthData auth) {
+    public void createAuth(AuthData auth) throws DataAccessException {
 
     }
 
@@ -48,7 +48,7 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void deleteAuth(AuthData auth) {
+    public void deleteAuth(AuthData auth) throws DataAccessException {
 
     }
 
@@ -63,7 +63,7 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame(int gameID, GameData game) {
+    public void updateGame(int gameID, GameData game) throws DataAccessException {
 
     }
 

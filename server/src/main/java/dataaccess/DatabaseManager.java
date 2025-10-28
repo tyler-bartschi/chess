@@ -13,7 +13,7 @@ public class DatabaseManager {
             """
             CREATE TABLE IF NOT EXISTS users (
             id int NOT NULL AUTO_INCREMENT,
-            username VARCHAR(255) NOT NULL,
+            username VARCHAR(255) NOT NULL UNIQUE,
             email VARCHAR(255) NOT NULL,
             password VARCHAR(255) NOT NULL,
             PRIMARY KEY(id),
@@ -23,11 +23,12 @@ public class DatabaseManager {
             """
             CREATE TABLE IF NOT EXISTS auth (
             id int NOT NULL AUTO_INCREMENT,
-            authToken VARCHAR(255) NOT NULL,
+            authToken VARCHAR(255) NOT NULL UNIQUE,
             username VARCHAR(255) NOT NULL,
             PRIMARY KEY(id),
             INDEX(authToken),
-            INDEX(username)
+            INDEX(username),
+            FOREIGN KEY(username) REFERENCES users(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """,
             """
@@ -37,7 +38,9 @@ public class DatabaseManager {
             blackUsername VARCHAR(255) DEFAULT NULL,
             gameName VARCHAR(255) NOT NULL,
             game TEXT NOT NULL,
-            PRIMARY KEY(id)
+            PRIMARY KEY(id),
+            FOREIGN KEY(whiteUsername) REFERENCES users(username),
+            FOREIGN KEY(blackUsername) REFERENCES users(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };

@@ -29,6 +29,9 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
+        if (users.containsKey(user.username())) {
+            throw new DataAccessException("This username is already taken");
+        }
         users.put(user.username(), user);
     }
 
@@ -39,6 +42,9 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
+        if (authsByToken.containsKey(auth.authToken())) {
+            throw new DataAccessException("AuthToken already exists");
+        }
         authsByUser.put(auth.username(), auth);
         authsByToken.put(auth.authToken(), auth);
     }
@@ -54,13 +60,16 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void deleteAuth(AuthData auth) {
+    public void deleteAuth(AuthData auth) throws DataAccessException {
+        if (!authsByUser.containsKey(auth.username())) {
+            throw new DataAccessException("Authorization already removed for this user");
+        }
         authsByUser.remove(auth.username());
         authsByToken.remove(auth.authToken());
     }
 
     @Override
-    public GameData createGame(GameDataNoID newGame) throws DataAccessException {
+    public GameData createGame(GameDataNoID newGame) {
         int gameID = generateValidGameID();
         GameData game = new GameData(gameID, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
         games.put(gameID, game);
@@ -74,6 +83,9 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public void updateGame(int gameID, GameData game) throws DataAccessException {
+        if (!games.containsKey(gameID)) {
+            throw new DataAccessException("That game does not exist!");
+        }
         games.put(gameID, game);
     }
 
@@ -84,6 +96,9 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public void createGameWithID(GameData game) throws DataAccessException {
+        if (games.containsKey(game.gameID())) {
+            throw new DataAccessException("That gameID already exists");
+        }
         games.put(game.gameID(), game);
     }
 
