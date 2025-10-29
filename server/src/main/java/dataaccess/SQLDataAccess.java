@@ -106,54 +106,12 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public AuthData getAuth(String username) throws DataAccessException {
-        String resAuthToken = "";
-        String resUsername = "";
-        try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT authToken, username FROM auth WHERE username=?";
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setString(1, username);
-                try (ResultSet res = preparedStatement.executeQuery()) {
-                    if (res.next()) {
-                        resAuthToken = res.getString(1);
-                        resUsername = res.getString(2);
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage());
-        }
-
-        if (!resAuthToken.isEmpty() && !resUsername.isEmpty()) {
-            return new AuthData(resUsername, resAuthToken);
-        }
-
-        return null;
+        return getAuthVariable(false, username);
     }
 
     @Override
     public AuthData getAuthByToken(String authToken) throws DataAccessException {
-        String resAuthToken = "";
-        String resUsername = "";
-        try (var conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT authToken, username FROM auth WHERE authToken=?";
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setString(1, authToken);
-                try (ResultSet res = preparedStatement.executeQuery()) {
-                    if (res.next()) {
-                        resAuthToken = res.getString(1);
-                        resUsername = res.getString(2);
-                    }
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage());
-        }
-
-        if (!resAuthToken.isEmpty() && !resUsername.isEmpty()) {
-            return new AuthData(resUsername, resAuthToken);
-        }
-
-        return null;
+        return getAuthVariable(true, authToken);
     }
 
     @Override
@@ -305,5 +263,31 @@ public class SQLDataAccess implements DataAccess {
         }
 
         return games;
+    }
+
+    private AuthData getAuthVariable(boolean byToken, String value) throws DataAccessException{
+        String resAuthToken = "";
+        String resUsername = "";
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = byToken ? "SELECT authToken, username FROM auth WHERE authToken=?" :
+                    "SELECT authToken, username FROM auth WHERE username=?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, value);
+                try (ResultSet res = preparedStatement.executeQuery()) {
+                    if (res.next()) {
+                        resAuthToken = res.getString(1);
+                        resUsername = res.getString(2);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+
+        if (!resAuthToken.isEmpty() && !resUsername.isEmpty()) {
+            return new AuthData(resUsername, resAuthToken);
+        }
+
+        return null;
     }
 }

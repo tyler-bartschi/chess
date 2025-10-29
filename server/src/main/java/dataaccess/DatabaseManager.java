@@ -9,7 +9,7 @@ public class DatabaseManager {
     private static String dbPassword;
     private static String connectionUrl;
 
-    private final static String[] tables = {
+    private final static String[] TABLES = {
             """
             CREATE TABLE IF NOT EXISTS users (
             id int NOT NULL AUTO_INCREMENT,
@@ -66,7 +66,7 @@ public class DatabaseManager {
     }
 
     static public void createTables() throws DataAccessException {
-        for (String table : tables) {
+        for (String table : TABLES) {
             try (var conn = DatabaseManager.getConnection();
                  var preparedStatement = conn.prepareStatement(table)) {
                 preparedStatement.executeUpdate();

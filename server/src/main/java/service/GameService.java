@@ -30,7 +30,8 @@ public class GameService {
         return new ListResult(listOfGames);
     }
 
-    public SuccessEmptyResult joinGame(JoinRequest req) throws UnauthorizedException, InvalidRequestException, AlreadyTakenException, DataAccessException {
+    public SuccessEmptyResult joinGame(JoinRequest req) throws UnauthorizedException, InvalidRequestException,
+            AlreadyTakenException, DataAccessException {
         verifyAuthToken(req.authToken());
         String username = dataAccess.getAuthByToken(req.authToken()).username();
 
