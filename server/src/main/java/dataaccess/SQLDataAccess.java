@@ -241,7 +241,27 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public void updateGame(int gameID, GameData game) throws DataAccessException {
+        int rowsUpdated = 0;
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "UPDATE games SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE id=?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, game.whiteUsername());
+                preparedStatement.setString(2, game.blackUsername());
+                preparedStatement.setString(3, game.gameName());
+                preparedStatement.setString(4, serializer.toJson(game.game()));
+                preparedStatement.setInt(5, gameID);
+                rowsUpdated = preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
 
+        if (rowsUpdated < 1) {
+            throw new DataAccessException("Invalid gameID to update");
+        }
+        if (rowsUpdated > 1) {
+            throw new DataAccessException("Critical failure: more games than 1 updated at once");
+        }
     }
 
     @Override

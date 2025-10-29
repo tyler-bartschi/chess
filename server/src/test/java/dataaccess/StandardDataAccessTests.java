@@ -386,7 +386,7 @@ public class StandardDataAccessTests {
         DataAccess dataAccess = getDataAccess(dbClass);
 
         GameData game = new GameData(12343214, null, null, "gameName", new ChessGame());
-        assertThrows(DataAccessException.class, () -> dataAccess.updateGame(123423, game));
+        assertThrows(DataAccessException.class, () -> dataAccess.updateGame(12343214, game));
     }
 
     @ParameterizedTest
