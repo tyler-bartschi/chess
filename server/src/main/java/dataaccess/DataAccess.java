@@ -8,7 +8,7 @@ public interface DataAccess {
     /**
      * Clears the entire database
      */
-    void clear();
+    void clear() throws DataAccessException ;
 
     /**
      * Adds the provided user to the database
@@ -24,7 +24,7 @@ public interface DataAccess {
      * @param username Username of the requested user
      * @return UserData of the user, null if the username does not exist
      */
-    UserData getUser(String username);
+    UserData getUser(String username) throws DataAccessException;
 
     /**
      * Adds the authorization data for a particular user into the database
@@ -40,7 +40,7 @@ public interface DataAccess {
      * @param username username of the user authorization data being requested
      * @return AuthData if the user has a valid authorization, null if not
      */
-    AuthData getAuth(String username);
+    AuthData getAuth(String username) throws DataAccessException;
 
     /**
      * Gets the authorization data associated with a particular authToken
@@ -48,7 +48,7 @@ public interface DataAccess {
      * @param authToken authToken of the user authorization data being requested
      * @return AuthData if the user has a valid authorization, null if not
      */
-    AuthData getAuthByToken(String authToken);
+    AuthData getAuthByToken(String authToken) throws DataAccessException;
 
     /**
      * Deletes the authData of a user
@@ -64,7 +64,7 @@ public interface DataAccess {
      * @param game GameDataNoID, which includes all game data except for the gameID
      * @return the full GameData if successful, including the gameID, null if not successful
      */
-    GameData createGame(GameDataNoID game);
+    GameData createGame(GameDataNoID game) throws DataAccessException;
 
     /**
      * Gets a game by the requested gameID
@@ -72,7 +72,7 @@ public interface DataAccess {
      * @param gameID ID of the requested game
      * @return GameData associated with the ID if it exists, null if not
      */
-    GameData getGame(int gameID);
+    GameData getGame(int gameID) throws DataAccessException;
 
     /**
      * Updates a game, given a gameID and the new GameData to update it with
@@ -88,7 +88,7 @@ public interface DataAccess {
      *
      * @return a Collection of GameData representing all the games in the database, and an empty collection if there's none
      */
-    Collection<GameData> getAllGames();
+    Collection<GameData> getAllGames() throws DataAccessException;
 
     /**
      * Creates a new game in the database, with the ID given, primarily used for testing purposes

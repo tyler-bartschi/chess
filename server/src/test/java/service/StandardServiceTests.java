@@ -127,7 +127,7 @@ public class StandardServiceTests {
         CreateRequest req = new CreateRequest(START_AUTH, "nameOfGame");
         CreateResult res = assertDoesNotThrow(() -> testGameService.createGame(req), "Failed to create game");
         assertInstanceOf(Integer.class, res.gameID(), "gameID is not an integer");
-        GameData obj = testDataAccess.getGame(res.gameID());
+        GameData obj = assertDoesNotThrow(() -> testDataAccess.getGame(res.gameID()));
         assertNotNull(obj, "GameData object is null");
         assertEquals(req.gameName(), obj.gameName(), "Game name does not match");
     }
@@ -158,7 +158,7 @@ public class StandardServiceTests {
         assertDoesNotThrow(() -> testGameService.joinGame(req1));
         assertDoesNotThrow(() -> testGameService.joinGame(req2));
 
-        GameData game = testDataAccess.getGame(gameID);
+        GameData game = assertDoesNotThrow(() -> testDataAccess.getGame(gameID));
         assertEquals(user1, game.whiteUsername(), "White username does not match");
         assertEquals(user2, game.blackUsername(), "Black username does not match");
     }
@@ -212,7 +212,7 @@ public class StandardServiceTests {
     @Order(15)
     @DisplayName("List Request Success")
     public void listSuccess() {
-        testUserService.clear();
+        assertDoesNotThrow(() -> testUserService.clear());
         int gameID1 = 1234234;
         String gameName1 = "FirstGame";
         int gameID2 = 123414321;
@@ -250,11 +250,11 @@ public class StandardServiceTests {
         String authToken = "uniquelyAnAuth";
         assertDoesNotThrow(() -> testDataAccess.createAuth(new AuthData("username", authToken)));
         assertDoesNotThrow(() -> testDataAccess.createGameWithID(new GameData(1234, null, null, "testGame", new ChessGame())));
-        testUserService.clear();
-        UserData noUser = testDataAccess.getUser(START_USERNAME);
-        AuthData noAuth = testDataAccess.getAuth(START_USERNAME);
-        AuthData stillNoAuth = testDataAccess.getAuthByToken(START_AUTH);
-        GameData noGame = testDataAccess.getGame(1234);
+        assertDoesNotThrow(() -> testUserService.clear());
+        UserData noUser = assertDoesNotThrow(() -> testDataAccess.getUser(START_USERNAME));
+        AuthData noAuth = assertDoesNotThrow(() -> testDataAccess.getAuth(START_USERNAME));
+        AuthData stillNoAuth = assertDoesNotThrow(() -> testDataAccess.getAuthByToken(START_AUTH));
+        GameData noGame = assertDoesNotThrow(() -> testDataAccess.getGame(1234));
         assertNull(noUser, "Did not clear the user datatable");
         assertNull(noAuth, "Did not clear the authByUsername datatable");
         assertNull(stillNoAuth, "Did not clear the authByToken datatable");

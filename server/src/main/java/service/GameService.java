@@ -20,7 +20,7 @@ public class GameService {
         this.dataAccess = dataAccess;
     }
 
-    public ListResult listGames(ListRequest req) throws UnauthorizedException {
+    public ListResult listGames(ListRequest req) throws UnauthorizedException, DataAccessException {
         verifyAuthToken(req.authToken());
         Collection<GameData> games = dataAccess.getAllGames();
         ArrayList<AbbrGameData> listOfGames = new ArrayList<>();
@@ -75,7 +75,7 @@ public class GameService {
                 existingGame.gameName(), existingGame.game()));
     }
 
-    private void verifyAuthToken(String authToken) throws UnauthorizedException {
+    private void verifyAuthToken(String authToken) throws UnauthorizedException, DataAccessException {
         AuthData auth = dataAccess.getAuthByToken(authToken);
         if (auth == null) {
             throw new UnauthorizedException("Unauthorized");

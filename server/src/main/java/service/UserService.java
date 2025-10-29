@@ -19,7 +19,7 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException{
         dataAccess.clear();
     }
 

@@ -20,7 +20,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
         users.clear();
         authsByUser.clear();
         authsByToken.clear();
@@ -36,7 +36,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws DataAccessException {
         return users.get(username);
     }
 
@@ -50,12 +50,12 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public AuthData getAuth(String username) {
+    public AuthData getAuth(String username) throws DataAccessException {
         return authsByUser.get(username);
     }
 
     @Override
-    public AuthData getAuthByToken(String authToken) {
+    public AuthData getAuthByToken(String authToken) throws DataAccessException {
         return authsByToken.get(authToken);
     }
 
@@ -69,7 +69,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData createGame(GameDataNoID newGame) {
+    public GameData createGame(GameDataNoID newGame) throws DataAccessException {
         int gameID = generateValidGameID();
         GameData game = new GameData(gameID, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
         games.put(gameID, game);
@@ -77,7 +77,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException {
         return games.get(gameID);
     }
 
@@ -90,7 +90,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public Collection<GameData> getAllGames() {
+    public Collection<GameData> getAllGames() throws DataAccessException {
         return games.values();
     }
 
@@ -102,7 +102,7 @@ public class MemoryDataAccess implements DataAccess {
         games.put(game.gameID(), game);
     }
 
-    private int generateValidGameID() {
+    private int generateValidGameID() throws DataAccessException {
         gamesCreated++;
         int gameID = gamesCreated;
         GameData possibleGame = getGame(gameID);

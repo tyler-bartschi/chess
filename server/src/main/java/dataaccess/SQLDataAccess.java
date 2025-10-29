@@ -27,7 +27,7 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             for (String statement : clearStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
@@ -35,7 +35,7 @@ public class SQLDataAccess implements DataAccess {
                 }
             }
             DatabaseManager.createTables();
-        } catch (SQLException | DataAccessException ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex.getMessage());
         }
     }
@@ -56,7 +56,7 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws DataAccessException {
         String resUsername = "";
         String resEmail = "";
         String resPass = "";
@@ -72,7 +72,7 @@ public class SQLDataAccess implements DataAccess {
                     }
                 }
             }
-        } catch (SQLException | DataAccessException ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex.getMessage());
         }
 
@@ -84,16 +84,31 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, auth.authToken());
+                preparedStatement.setString(2, auth.username());
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 
     @Override
-    public AuthData getAuth(String username) {
+    public AuthData getAuth(String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+
+        } catch (SQLException ex) {
+
+        }
+
         return null;
     }
 
     @Override
-    public AuthData getAuthByToken(String authToken) {
+    public AuthData getAuthByToken(String authToken) throws DataAccessException {
         return null;
     }
 
@@ -103,12 +118,12 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData createGame(GameDataNoID game) {
+    public GameData createGame(GameDataNoID game) throws DataAccessException {
         return null;
     }
 
     @Override
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException {
         return null;
     }
 
@@ -123,7 +138,7 @@ public class SQLDataAccess implements DataAccess {
     }
 
     @Override
-    public Collection<GameData> getAllGames() {
+    public Collection<GameData> getAllGames() throws DataAccessException {
         return List.of();
     }
 }

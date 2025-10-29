@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import server.exceptions.UnauthorizedException;
 import service.GameService;
@@ -17,7 +18,7 @@ public class ListGamesHandler extends AuthVerificationHandler {
         this.serializer = serializer;
     }
 
-    public void listGames(Context ctx) throws UnauthorizedException {
+    public void listGames(Context ctx) throws UnauthorizedException, DataAccessException {
         String authToken = ctx.header("Authorization");
         verifyAuth(authToken);
 

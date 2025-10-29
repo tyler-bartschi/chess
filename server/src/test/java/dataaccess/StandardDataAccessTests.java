@@ -25,7 +25,7 @@ public class StandardDataAccessTests {
     @AfterAll
     static public void clearSQLDatabase() {
         DataAccess dataAccess = new SQLDataAccess();
-        dataAccess.clear();
+        assertDoesNotThrow(() -> dataAccess.clear());
     }
 
     @ParameterizedTest
@@ -282,7 +282,7 @@ public class StandardDataAccessTests {
     @DisplayName("Get Games Success")
     public void getGamesPass(Class<? extends DataAccess> dbClass) {
         DataAccess dataAccess = getDataAccess(dbClass);
-        dataAccess.clear();
+        assertDoesNotThrow(() -> dataAccess.clear());
 
         String username = "getGamePassName1";
         String authToken = "getGamePassToken1";
@@ -325,7 +325,7 @@ public class StandardDataAccessTests {
     @DisplayName("Get Games Fail")
     public void getGamesFail(Class<? extends DataAccess> dbClass) {
         DataAccess dataAccess = getDataAccess(dbClass);
-        dataAccess.clear();
+        assertDoesNotThrow(() -> dataAccess.clear());
 
         Collection<GameData> games = assertDoesNotThrow(() -> dataAccess.getAllGames());
         assertTrue(games.isEmpty());
