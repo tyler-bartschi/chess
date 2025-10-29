@@ -78,13 +78,14 @@ public interface DataAccess {
      * Updates a game, given a gameID and the new GameData to update it with
      *
      * @param gameID gameID of the game to update
-     * @param game the full new GameData (including the gameID)
+     * @param game   the full new GameData (including the gameID)
      * @throws DataAccessException if the gameID is invalid
      */
     void updateGame(int gameID, GameData game) throws DataAccessException;
 
     /**
      * Gets all games in the database
+     *
      * @return a Collection of GameData representing all the games in the database, and an empty collection if there's none
      */
     Collection<GameData> getAllGames();
