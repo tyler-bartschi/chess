@@ -4,7 +4,6 @@ import model.*;
 
 import java.util.HashMap;
 import java.util.Collection;
-import java.util.ArrayList;
 
 public class MemoryDataAccess implements DataAccess {
 

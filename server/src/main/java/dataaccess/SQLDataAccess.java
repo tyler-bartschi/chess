@@ -3,12 +3,10 @@ package dataaccess;
 import com.google.gson.Gson;
 import model.*;
 
-import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import chess.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
