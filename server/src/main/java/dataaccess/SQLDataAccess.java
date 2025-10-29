@@ -3,6 +3,7 @@ package dataaccess;
 import com.google.gson.Gson;
 import model.*;
 
+import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -98,10 +99,25 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public AuthData getAuth(String username) throws DataAccessException {
+        String resAuthToken = "";
+        String resUsername = "";
         try (var conn = DatabaseManager.getConnection()) {
-
+            String statement = "SELECT authToken, username FROM auth WHERE username=?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, username);
+                try (ResultSet res = preparedStatement.executeQuery()) {
+                    if (res.next()) {
+                        resAuthToken = res.getString(1);
+                        resUsername = res.getString(2);
+                    }
+                }
+            }
         } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
 
+        if (!resAuthToken.isEmpty() && !resUsername.isEmpty()) {
+            return new AuthData(resUsername, resAuthToken);
         }
 
         return null;
@@ -109,12 +125,50 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public AuthData getAuthByToken(String authToken) throws DataAccessException {
+        String resAuthToken = "";
+        String resUsername = "";
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT authToken, username FROM auth WHERE authToken=?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, authToken);
+                try (ResultSet res = preparedStatement.executeQuery()) {
+                    if (res.next()) {
+                        resAuthToken = res.getString(1);
+                        resUsername = res.getString(2);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+
+        if (!resAuthToken.isEmpty() && !resUsername.isEmpty()) {
+            return new AuthData(resUsername, resAuthToken);
+        }
+
         return null;
     }
 
     @Override
     public void deleteAuth(AuthData auth) throws DataAccessException {
+        int rowsDeleted = 0;
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "DELETE FROM auth WHERE authToken=? AND username=?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, auth.authToken());
+                preparedStatement.setString(2, auth.username());
+                rowsDeleted = preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
 
+        if (rowsDeleted < 1) {
+            throw new DataAccessException("No authentication to delete. Are you already logged out?");
+        }
+        if (rowsDeleted > 1) {
+            throw new DataAccessException("Deleted multiple rows");
+        }
     }
 
     @Override
