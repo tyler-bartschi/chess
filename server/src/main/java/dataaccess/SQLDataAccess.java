@@ -266,7 +266,19 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public void createGameWithID(GameData game) throws DataAccessException {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO games (id, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setInt(1, game.gameID());
+                preparedStatement.setString(2, game.whiteUsername());
+                preparedStatement.setString(3, game.blackUsername());
+                preparedStatement.setString(4, game.gameName());
+                preparedStatement.setString(5, serializer.toJson(game.game()));
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 
     @Override
