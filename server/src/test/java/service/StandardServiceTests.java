@@ -27,7 +27,7 @@ public class StandardServiceTests {
 
     @BeforeAll
     public static void init() {
-        testDataAccess = new MemoryDataAccess();
+        testDataAccess = new SQLDataAccess();
         testUserService = new UserService(testDataAccess);
         testGameService = new GameService(testDataAccess);
         RegisterRequest request = new RegisterRequest(START_USERNAME, START_EMAIL, START_PASSWORD);

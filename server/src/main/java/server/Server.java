@@ -22,7 +22,7 @@ public class Server {
 
 
         // initialize dataAccess
-        DataAccess dataAccess = new MemoryDataAccess();
+        DataAccess dataAccess = new SQLDataAccess();
 
 
         // initialize services
