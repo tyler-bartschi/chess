@@ -6,6 +6,7 @@ import model.*;
 import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import chess.*;
@@ -283,6 +284,26 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public Collection<GameData> getAllGames() throws DataAccessException {
-        return List.of();
+        ArrayList<GameData> games = new ArrayList<>();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT * FROM games";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (ResultSet res = preparedStatement.executeQuery()) {
+                    while (res.next()) {
+                        int gameID = res.getInt(1);
+                        String whiteUsername = res.getString(2);
+                        String blackUsername = res.getString(3);
+                        String gameName = res.getString(4);
+                        ChessGame game = serializer.fromJson(res.getString(5), ChessGame.class);
+                        games.add(new GameData(gameID, whiteUsername, blackUsername, gameName, game));
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+
+        return games;
     }
 }
