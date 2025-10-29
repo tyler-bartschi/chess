@@ -8,8 +8,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import chess.*;
+
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SQLDataAccess implements DataAccess {
+
+    private final Gson serializer;
 
     private final String[] clearStatements = {
             "DROP TABLE games",
@@ -25,6 +30,7 @@ public class SQLDataAccess implements DataAccess {
             System.out.println("Failure to create database or tables");
             throw new RuntimeException("Failure to create database or tables.");
         }
+        serializer = new Gson();
     }
 
     @Override
@@ -173,11 +179,63 @@ public class SQLDataAccess implements DataAccess {
 
     @Override
     public GameData createGame(GameDataNoID game) throws DataAccessException {
+        int gameID = 0;
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+            try (var preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                preparedStatement.setString(1, game.whiteUsername());
+                preparedStatement.setString(2, game.blackUsername());
+                preparedStatement.setString(3, game.gameName());
+                String gameText = serializer.toJson(game.game());
+                preparedStatement.setString(4, gameText);
+                preparedStatement.executeUpdate();
+                try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                    if (resultSet.next()) {
+                        gameID = resultSet.getInt(1);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+
+        if (gameID != 0) {
+            return getGame(gameID);
+        }
+
         return null;
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
+        int resGameID = 0;
+        String resWhiteUsername = "";
+        String resBlackUsername = "";
+        String resGameName = "";
+        String resGame = "";
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT id, whiteUsername, blackUsername, gameName, game FROM games where id=?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setInt(1, gameID);
+                try (ResultSet res = preparedStatement.executeQuery()) {
+                    if (res.next()) {
+                        resGameID = res.getInt(1);
+                        resWhiteUsername = res.getString(2);
+                        resBlackUsername = res.getString(3);
+                        resGameName = res.getString(4);
+                        resGame = res.getString(5);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+
+        if (resGameID != 0 && !resGameName.isEmpty() && !resGame.isEmpty()) {
+            ChessGame chessGame = serializer.fromJson(resGame, ChessGame.class);
+            return new GameData(resGameID, resWhiteUsername, resBlackUsername, resGameName, chessGame);
+        }
+
         return null;
     }
 
