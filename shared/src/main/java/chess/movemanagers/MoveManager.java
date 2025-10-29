@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MoveManager implements MovementRule {
-    private final MovementRule rook = new RookMovement();
-    private final MovementRule knight = new KnightMovement();
-    private final MovementRule bishop = new BishopMovement();
-    private final MovementRule queen = new QueenMovement();
-    private final MovementRule king = new KingMovement();
-    private final MovementRule pawn = new PawnMovement();
+    private final RookMovement rook = new RookMovement();
+    private final KnightMovement knight = new KnightMovement();
+    private final BishopMovement bishop = new BishopMovement();
+    private final QueenMovement queen = new QueenMovement();
+    private final KingMovement king = new KingMovement();
+    private final PawnMovement pawn = new PawnMovement();
 
     public MoveManager() {
 
