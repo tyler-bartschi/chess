@@ -127,6 +127,19 @@ public class ChessBoard {
         }
     }
 
+    public ChessBoard invertBoard() {
+        ChessBoard newBoard = new ChessBoard();
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition curPosition = new ChessPosition(row, col);
+                ChessPosition newPosition = new ChessPosition(9 - row, 9 - col);
+                newBoard.addPiece(newPosition, getPiece(curPosition));
+            }
+        }
+
+        return newBoard;
+    }
+
     /**
      * Returns a string for use with the ChessGame object
      *
