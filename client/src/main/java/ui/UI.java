@@ -7,21 +7,21 @@ import static ui.EscapeSequences.*;
 
 public class UI {
 
-    private authState state;
+    private AuthState state;
     private final String port;
 
-    private enum authState {
+    private enum AuthState {
         UNAUTHENTICATED,
         AUTHENTICATED
     }
 
     public UI(String port) {
-        state = authState.UNAUTHENTICATED;
+        state = AuthState.UNAUTHENTICATED;
         this.port = port;
     }
 
     public void run() {
-        System.out.println(WHITE_KING + " Welcome to chess! Type Help to get started. " + BLACK_KING);
+        System.out.println(WHITE_KING + " Welcome to chess! Type 'help' to get started. " + BLACK_KING);
 
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
@@ -37,11 +37,13 @@ public class UI {
                 printErrorMessage("An unidentified error occurred. Please try again.");
             }
         }
+
+        System.out.println("Thanks for playing!");
     }
 
     private void printPrompt() {
         resetTextEffects();
-        if (state == authState.AUTHENTICATED) {
+        if (state == AuthState.UNAUTHENTICATED) {
             System.out.print(SET_TEXT_BOLD + "[LOGGED_OUT] " + RESET_TEXT_BOLD_FAINT + ">>> ");
         } else {
             System.out.print(SET_TEXT_BOLD + "[LOGGED_IN] " + RESET_TEXT_BOLD_FAINT + ">>> ");
@@ -60,12 +62,13 @@ public class UI {
                 throw new InputException("No input provided, please type a command.");
             }
             String cmd = tokens[0];
+            String[] rawParams = Arrays.copyOfRange(line.split("\\s+"), 1, tokens.length);
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             return switch (cmd) {
                 case "help" -> help();
-                case "login" -> login(params);
-                case "register" -> register(params);
+                case "login" -> login(rawParams);
+                case "register" -> register(rawParams);
                 case "logout" -> logout();
                 case "create" -> create(params);
                 case "list" -> list();
@@ -87,6 +90,24 @@ public class UI {
     }
 
     private boolean help() {
+        String caseSensitive = SET_TEXT_COLOR_MAGENTA + "NOTE: fields surrounded by <> are " + SET_TEXT_BOLD + "case sensitive" + RESET_TEXT_BOLD_FAINT;
+        if (state == AuthState.UNAUTHENTICATED) {
+            printBlueAndWhite("register <USERNAME> <PASSWORD> <EMAIL> ", "- to create an account " + caseSensitive);
+            printBlueAndWhite("login <USERNAME> <PASSWORD> ", "- login to play chess " + caseSensitive);
+            printBlueAndWhite("quit ", "- quits the chess program");
+            printBlueAndWhite("help", " - display all possible commands");
+        }
+
+        if (state == AuthState.AUTHENTICATED) {
+            printBlueAndWhite("create <NAME> ", "- create a game, NAME will be made all lower case");
+            printBlueAndWhite("list ", "- list all games");
+            printBlueAndWhite("join <ID> [WHITE|BLACK] ", "- join a game");
+            printBlueAndWhite("observe <ID> ", "- observe a game");
+            printBlueAndWhite("logout ", "- logs out of the chess program");
+            printBlueAndWhite("quit ", "- quits the chess program");
+            printBlueAndWhite("help ", "- display all possible commands");
+        }
+        System.out.println();
         return true;
     }
 
@@ -95,6 +116,7 @@ public class UI {
     }
 
     private boolean register(String[] params) {
+        state = AuthState.AUTHENTICATED;
         return true;
     }
 
@@ -116,5 +138,9 @@ public class UI {
 
     private boolean observe(String[] params) {
         return true;
+    }
+
+    private void printBlueAndWhite(String first, String second) {
+        System.out.println(EMPTY + SET_TEXT_COLOR_BLUE + first + SET_TEXT_COLOR_WHITE + second);
     }
 }
