@@ -1,5 +1,6 @@
 package ui;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -23,14 +24,13 @@ public class UI {
         System.out.println(WHITE_KING + " Welcome to chess! Type Help to get started. " + BLACK_KING);
 
         Scanner scanner = new Scanner(System.in);
-        String result = "";
-        while (result != "quit") {
+        boolean running = true;
+        while (running) {
             printPrompt();
             String line = scanner.nextLine();
 
             try {
-                result = evaluate(line);
-                resetTextEffects();
+                running = evaluate(line);
             } catch (InputException ex) {
                 printErrorMessage(ex.getMessage());
             } catch (Throwable ex) {
@@ -52,9 +52,33 @@ public class UI {
         System.out.print(RESET_TEXT_BOLD_FAINT + RESET_TEXT_UNDERLINE + RESET_TEXT_ITALIC + RESET_TEXT_BLINKING + RESET_TEXT_COLOR + RESET_BG_COLOR);
     }
 
-    private String evaluate(String line) throws InputException, Exception{
+    private boolean evaluate(String line) throws InputException, Exception{
         resetTextEffects();
-        return "";
+        try {
+            String[] tokens = line.toLowerCase().split("\\s+");
+            if (tokens.length == 0) {
+                throw new InputException("No input provided, please type a command.");
+            }
+            String cmd = tokens[0];
+            String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+
+            return switch (cmd) {
+                case "help" -> help();
+                case "login" -> login(params);
+                case "register" -> register(params);
+                case "logout" -> logout();
+                case "create" -> create(params);
+                case "list" -> list();
+                case "join" -> join(params);
+                case "observe" -> observe(params);
+                case "quit" -> false;
+                default -> throw new InputException(cmd + " is not a recognized command. Run 'help' to see a list of available commands.");
+            };
+
+        } catch (Throwable ex) {
+            // general error handling, make this more specific when I make the ServerFacade
+        }
+        return true;
     }
 
     private void printErrorMessage(String msg) {
@@ -62,4 +86,35 @@ public class UI {
         System.out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_RED + msg);
     }
 
+    private boolean help() {
+        return true;
+    }
+
+    private boolean login(String[] params) {
+        return true;
+    }
+
+    private boolean register(String[] params) {
+        return true;
+    }
+
+    private boolean logout() {
+        return true;
+    }
+
+    private boolean create(String[] params) {
+        return true;
+    }
+
+    private boolean list() {
+        return true;
+    }
+
+    private boolean join(String[] params) {
+        return true;
+    }
+
+    private boolean observe(String[] params) {
+        return true;
+    }
 }
