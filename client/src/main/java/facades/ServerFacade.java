@@ -4,6 +4,7 @@ import chess.*;
 import com.google.gson.Gson;
 import ui.BoardRenderer;
 import ui.InputException;
+import static ui.EscapeSequences.*;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -90,8 +91,35 @@ public class ServerFacade {
     }
 
     public String logout(String[] params) throws ResponseException {
-        // invalidate all fields
-        return "";
+        if (params.length > 0) {
+            System.out.println(SET_TEXT_COLOR_RED + "Ignoring additional provided parameters." + RESET_TEXT_COLOR);
+        }
+
+        try {
+            String urlString = serverUrl + "/session";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(urlString))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .DELETE()
+                    .header("Authorization", authToken)
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                String result = username + " logged out successfully.";
+                username = "";
+                authToken = "";
+                gameIDs.clear();
+                return result;
+            } else {
+                var responseBody = serializer.fromJson(response.body(), Map.class);
+                throw new ResponseException(responseBody.get("message").toString());
+            }
+
+        } catch (URISyntaxException | IOException | InterruptedException ex) {
+            throw new RuntimeException("Failure in HTTP: " + ex.getMessage());
+        }
     }
 
     public String create(String[] params) throws InputException, ResponseException {
