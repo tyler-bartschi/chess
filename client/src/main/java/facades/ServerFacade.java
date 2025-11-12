@@ -170,6 +170,10 @@ public class ServerFacade {
                 StringBuilder stringBuilder = new StringBuilder();
                 List<Game> games = responseBody.getGames();
 
+                if (games.isEmpty()) {
+                    return "No games created yet.";
+                }
+
                 int count = 1;
                 for (Game game : games) {
                     gameIDs.put(count, game.gameID());
@@ -191,9 +195,49 @@ public class ServerFacade {
     }
 
     public String join (String[] params) throws InputException, ResponseException {
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
-        return boardRenderer.renderGameBoard(ChessGame.TeamColor.WHITE, board);
+        if (params.length < 2) {
+            throw new InputException("Must provide <ID> and <WHITE|BLACK>");
+        }
+
+        try {
+            if (!gameIDs.containsKey(Integer.parseInt(params[0]))) {
+                throw new InputException("Must provide a valid <ID>");
+            }
+            var body = Map.of("playerColor", params[1], "gameID", gameIDs.get(Integer.parseInt(params[0])));
+            String json = serializer.toJson(body);
+            String urlString = serverUrl + "/game";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(urlString))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .PUT(BodyPublishers.ofString(json))
+                    .header("Authorization", authToken)
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(username).append(" successfully joined as ").append(params[1].toUpperCase()).append("\n\n");
+
+                ChessBoard board = new ChessBoard();
+                board.resetBoard();
+
+                if (params[1].equalsIgnoreCase("WHITE")) {
+                    stringBuilder.append(boardRenderer.renderGameBoard(ChessGame.TeamColor.WHITE, board));
+                } else {
+                    stringBuilder.append(boardRenderer.renderGameBoard(ChessGame.TeamColor.BLACK, board));
+                }
+
+                return stringBuilder.toString();
+            } else {
+                var responseBody = serializer.fromJson(response.body(), Map.class);
+                throw new ResponseException(responseBody.get("message").toString());
+
+            }
+
+        } catch (URISyntaxException | IOException | InterruptedException ex) {
+            throw new RuntimeException("Failure in HTTP: " + ex.getMessage());
+        }
     }
 
     public String observe(String[] params) throws InputException, ResponseException {

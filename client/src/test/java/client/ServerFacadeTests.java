@@ -151,7 +151,7 @@ public class ServerFacadeTests {
     @DisplayName("Join Success")
     public void joinHappy() {
         String username = "joinUsername";
-        String color = "white";
+        String color = "WHITE";
         addUserToDatabase(username, "password");
         addGameToDatabase("firstGameName");
         listGames();
@@ -176,7 +176,7 @@ public class ServerFacadeTests {
         assertThrows(InputException.class, () -> facade.join(new String[]{"17", "white"}));
         assertDoesNotThrow(() -> facade.join(new String[]{"1", "white"}));
         logoutUser();
-        assertThrows(ResponseException.class, () -> facade.join(new String[]{"1", "white"}));
+        assertThrows(InputException.class, () -> facade.join(new String[]{"1", "white"}));
         addUserToDatabase("aDifferentUser", "myPasswordOnceAgain");
         listGames();
         assertThrows(ResponseException.class, () -> facade.join(new String[]{"1", "white"}));
