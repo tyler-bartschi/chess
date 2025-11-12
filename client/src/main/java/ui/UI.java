@@ -1,6 +1,8 @@
 package ui;
 
 import chess.*;
+import facades.*;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -9,16 +11,16 @@ import static ui.EscapeSequences.*;
 public class UI {
 
     private AuthState state;
-    private final String port;
+    private final ServerFacade serverFacade;
 
     private enum AuthState {
         UNAUTHENTICATED,
         AUTHENTICATED
     }
 
-    public UI(String port) {
+    public UI(int port) {
         state = AuthState.UNAUTHENTICATED;
-        this.port = port;
+        serverFacade = new ServerFacade(port);
     }
 
     public void run() {
@@ -55,34 +57,29 @@ public class UI {
         System.out.print(RESET_TEXT_BOLD_FAINT + RESET_TEXT_UNDERLINE + RESET_TEXT_ITALIC + RESET_TEXT_BLINKING + RESET_TEXT_COLOR + RESET_BG_COLOR);
     }
 
-    private boolean evaluate(String line) throws InputException, Exception{
+    private boolean evaluate(String line) throws InputException {
         resetTextEffects();
-        try {
-            String[] tokens = line.toLowerCase().split("\\s+");
-            if (tokens.length == 0) {
-                throw new InputException("No input provided, please type a command.");
-            }
-            String cmd = tokens[0];
-            String[] rawParams = Arrays.copyOfRange(line.split("\\s+"), 1, tokens.length);
-            String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-
-            return switch (cmd) {
-                case "help" -> help();
-                case "login" -> login(rawParams);
-                case "register" -> register(rawParams);
-                case "logout" -> logout();
-                case "create" -> create(params);
-                case "list" -> list();
-                case "join" -> join(params);
-                case "observe" -> observe(params);
-                case "quit" -> false;
-                default -> throw new InputException(cmd + " is not a recognized command. Run 'help' to see a list of available commands.");
-            };
-
-        } catch (Throwable ex) {
-            // general error handling, make this more specific when I make the ServerFacade
+        String[] tokens = line.toLowerCase().split("\\s+");
+        if (tokens[0].isEmpty()) {
+            throw new InputException("No input provided, please type a command.");
         }
-        return true;
+        String cmd = tokens[0];
+        String[] rawParams = Arrays.copyOfRange(line.split("\\s+"), 1, tokens.length);
+        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+
+        return switch (cmd) {
+            case "help" -> help();
+            case "login" -> login(rawParams);
+            case "register" -> register(rawParams);
+            case "logout" -> logout();
+            case "create" -> create(params);
+            case "list" -> list();
+            case "join" -> join(params);
+            case "observe" -> observe(params);
+            case "quit" -> false;
+            default ->
+                    throw new InputException("'" + cmd + "'" + " is not a recognized command. Run 'help' to see a list of available commands.");
+        };
     }
 
     private void printErrorMessage(String msg) {
@@ -112,28 +109,35 @@ public class UI {
         return true;
     }
 
-    private boolean login(String[] params) {
+    private boolean login(String[] params) throws InputException {
+        throwIfAuthenticated("You are already logged in.");
         return true;
     }
 
-    private boolean register(String[] params) {
+    private boolean register(String[] params) throws InputException {
+        throwIfAuthenticated("You cannot register while logged in.");
         state = AuthState.AUTHENTICATED;
         return true;
     }
 
-    private boolean logout() {
+    private boolean logout() throws InputException {
+        throwIfUnauthenticated("You are already logged out.");
+        state = AuthState.UNAUTHENTICATED;
         return true;
     }
 
-    private boolean create(String[] params) {
+    private boolean create(String[] params) throws InputException {
+        throwIfUnauthenticated("Must be logged in to create a game.");
         return true;
     }
 
-    private boolean list() {
+    private boolean list() throws InputException {
+        throwIfUnauthenticated("Must be logged in to list games.");
         return true;
     }
 
-    private boolean join(String[] params) {
+    private boolean join(String[] params) throws InputException {
+        throwIfUnauthenticated("Must be logged in to join a game");
         ChessBoard board = new ChessBoard();
         board.resetBoard();
         System.out.println("WHITE CHESSBOARD");
@@ -143,8 +147,21 @@ public class UI {
         return true;
     }
 
-    private boolean observe(String[] params) {
+    private boolean observe(String[] params) throws InputException {
+        throwIfUnauthenticated("Must be logged in to observe a game.");
         return true;
+    }
+
+    private void throwIfUnauthenticated(String message) throws InputException {
+        if (state == AuthState.UNAUTHENTICATED) {
+            throw new InputException(message);
+        }
+    }
+
+    private void throwIfAuthenticated(String message) throws InputException {
+        if (state == AuthState.AUTHENTICATED) {
+            throw new InputException(message);
+        }
     }
 
     private void printBlueAndWhite(String first, String second) {
@@ -169,7 +186,7 @@ public class UI {
     }
 
     private void printLetterPositions(String[] letters) {
-        System.out.print(SET_BG_COLOR_WHITE  + SET_TEXT_COLOR_BLACK + EMPTY);
+        System.out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + EMPTY);
         for (String letter : letters) {
             System.out.print(" " + letter + " ");
         }

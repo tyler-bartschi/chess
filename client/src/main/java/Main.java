@@ -3,9 +3,9 @@ import ui.UI;
 
 public class Main {
     public static void main(String[] args) {
-        String serverPort = "8080";
+        int serverPort = 8080;
         if (args.length >= 1) {
-            serverPort = args[0];
+            serverPort = Integer.parseInt(args[0]);
         }
 
         try {
