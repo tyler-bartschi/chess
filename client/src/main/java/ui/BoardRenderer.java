@@ -47,11 +47,20 @@ public class BoardRenderer {
         boolean isWhite = (team == ChessGame.TeamColor.WHITE) == (num % 2 == 0);
         String printableNum = " " + number + " ";
         result.append(SET_BG_COLOR_WHITE).append(SET_TEXT_COLOR_BLACK).append(printableNum).append(RESET_TEXT_COLOR);
-        for (int i = 1; i < 9; i++) {
-            String bgColor = isWhite ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
-            result.append(bgColor).append(getPieceForPosition(num, i, board));
-            isWhite = !isWhite;
+        if (team == ChessGame.TeamColor.WHITE) {
+            for (int i = 1; i < 9; i++) {
+                String bgColor = isWhite ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
+                result.append(bgColor).append(getPieceForPosition(num, i, board));
+                isWhite = !isWhite;
+            }
+        } else {
+            for (int i = 8; i >= 1; i--) {
+                String bgColor = isWhite ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
+                result.append(bgColor).append(getPieceForPosition(num, i, board));
+                isWhite = !isWhite;
+            }
         }
+
         result.append(SET_BG_COLOR_WHITE).append(SET_TEXT_COLOR_BLACK).append(printableNum)
                 .append(RESET_BG_COLOR).append(RESET_TEXT_COLOR).append("\n");
     }
