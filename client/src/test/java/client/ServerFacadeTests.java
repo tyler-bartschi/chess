@@ -20,7 +20,7 @@ public class ServerFacadeTests {
     private static String serverUrl;
 
     // for clearing the database
-    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @BeforeAll
     public static void init() {

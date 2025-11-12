@@ -21,7 +21,7 @@ import java.util.Map;
 public class ServerFacade {
 
     private final BoardRenderer boardRenderer;
-    private final HttpClient client;
+    private final HttpClient httpClient;
     private final Gson serializer;
 
     private final String serverUrl;
@@ -32,7 +32,7 @@ public class ServerFacade {
     public ServerFacade(int port) {
         serverUrl = "http://localhost:" + port;
         boardRenderer = new BoardRenderer();
-        client = HttpClient.newHttpClient();
+        httpClient = HttpClient.newHttpClient();
         serializer = new Gson();
         gameIDs = new HashMap<>();
     }
@@ -52,7 +52,7 @@ public class ServerFacade {
                     .POST(BodyPublishers.ofString(json))
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (processBodyForAuthentication(response)) {
                 return username + " successfully logged in.";
@@ -80,7 +80,7 @@ public class ServerFacade {
                     .POST(BodyPublishers.ofString(json))
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (processBodyForAuthentication(response)) {
                 return username + " successfully registered.";
@@ -104,7 +104,7 @@ public class ServerFacade {
                     .header("Authorization", authToken)
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
                 String result = username + " logged out successfully.";
@@ -138,7 +138,7 @@ public class ServerFacade {
                     .header("Authorization", authToken)
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             var responseBody = serializer.fromJson(response.body(), Map.class);
             if (response.statusCode() == 200) {
@@ -164,7 +164,7 @@ public class ServerFacade {
                     .header("Authorization", authToken)
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
                 var responseBody = serializer.fromJson(response.body(), GameListResponse.class);
@@ -217,7 +217,7 @@ public class ServerFacade {
                     .header("Authorization", authToken)
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
                 StringBuilder stringBuilder = new StringBuilder();
