@@ -123,7 +123,33 @@ public class ServerFacade {
     }
 
     public String create(String[] params) throws InputException, ResponseException {
-        return "";
+        if (params.length < 1) {
+            throw new InputException("Must provide <NAME>");
+        }
+
+        try {
+            var body = Map.of("gameName", params[0]);
+            String json = serializer.toJson(body);
+            String urlString = serverUrl + "/game";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(urlString))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .POST(BodyPublishers.ofString(json))
+                    .header("Authorization", authToken)
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            var responseBody = serializer.fromJson(response.body(), Map.class);
+            if (response.statusCode() == 200) {
+                return "Created game " + params[0];
+            } else {
+                throw new ResponseException(responseBody.get("message").toString());
+            }
+
+        } catch (URISyntaxException | IOException | InterruptedException ex) {
+            throw new RuntimeException("Failure in HTTP: " + ex.getMessage());
+        }
     }
 
     public String list(String[] params) throws ResponseException {
