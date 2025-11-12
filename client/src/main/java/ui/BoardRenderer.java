@@ -52,7 +52,8 @@ public class BoardRenderer {
             result.append(bgColor).append(getPieceForPosition(num, i, board));
             isWhite = !isWhite;
         }
-        result.append(SET_BG_COLOR_WHITE).append(SET_TEXT_COLOR_BLACK).append(printableNum).append(RESET_BG_COLOR).append(RESET_TEXT_COLOR).append("\n");
+        result.append(SET_BG_COLOR_WHITE).append(SET_TEXT_COLOR_BLACK).append(printableNum)
+                .append(RESET_BG_COLOR).append(RESET_TEXT_COLOR).append("\n");
     }
 
     private String getPieceForPosition(int row, int col, ChessBoard board) {

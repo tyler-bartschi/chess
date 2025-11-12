@@ -72,7 +72,8 @@ public class UI {
     }
 
     private boolean help() {
-        String caseSensitive = SET_TEXT_COLOR_MAGENTA + "NOTE: fields surrounded by <> are " + SET_TEXT_BOLD + "case sensitive" + RESET_TEXT_BOLD_FAINT;
+        String caseSensitive = SET_TEXT_COLOR_MAGENTA + "NOTE: fields surrounded by <> are "
+                + SET_TEXT_BOLD + "case sensitive" + RESET_TEXT_BOLD_FAINT;
         if (state == AuthState.UNAUTHENTICATED) {
             printBlueAndWhite("register <USERNAME> <PASSWORD> <EMAIL> ", "- to create an account " + caseSensitive);
             printBlueAndWhite("login <USERNAME> <PASSWORD> ", "- login to play chess " + caseSensitive);
