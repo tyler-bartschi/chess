@@ -4,6 +4,7 @@ import chess.*;
 import com.google.gson.Gson;
 import ui.BoardRenderer;
 import ui.InputException;
+
 import static ui.EscapeSequences.*;
 
 import java.io.IOException;
@@ -194,9 +195,12 @@ public class ServerFacade {
         }
     }
 
-    public String join (String[] params) throws InputException, ResponseException {
+    public String join(String[] params) throws InputException, ResponseException {
         if (params.length < 2) {
             throw new InputException("Must provide <ID> and <WHITE|BLACK>");
+        }
+        if (!params[0].matches("\\d+")) {
+            throw new InputException("Must provide a valid <ID>");
         }
 
         try {
@@ -241,7 +245,25 @@ public class ServerFacade {
     }
 
     public String observe(String[] params) throws InputException, ResponseException {
-        return "";
+        if (params.length < 1) {
+            throw new InputException("Must provide <ID>");
+        }
+
+        if (!params[0].matches("\\d+")) {
+            throw new InputException("Must provide a valid <ID>");
+        }
+
+        if (!gameIDs.containsKey(Integer.parseInt(params[0]))) {
+            throw new InputException("Must provide a valid <ID>");
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(username).append(" observing game ").append(params[0]).append("\n\n");
+
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+        stringBuilder.append(boardRenderer.renderGameBoard(ChessGame.TeamColor.WHITE, board));
+        return stringBuilder.toString();
     }
 
     private boolean processBodyForAuthentication(HttpResponse<String> response) throws ResponseException {
