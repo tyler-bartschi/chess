@@ -14,6 +14,7 @@ import java.net.http.HttpResponse;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ServerFacade {
@@ -25,7 +26,7 @@ public class ServerFacade {
     private final String serverUrl;
     private String authToken;
     private String username;
-    private HashMap<String, Integer> gameIDs;
+    private HashMap<Integer, Integer> gameIDs;
 
     public ServerFacade(int port) {
         serverUrl = "http://localhost:" + port;
@@ -91,9 +92,7 @@ public class ServerFacade {
     }
 
     public String logout(String[] params) throws ResponseException {
-        if (params.length > 0) {
-            System.out.println(SET_TEXT_COLOR_RED + "Ignoring additional provided parameters." + RESET_TEXT_COLOR);
-        }
+        ignoreAdditionalParametersMessage(params);
 
         try {
             String urlString = serverUrl + "/session";
@@ -153,7 +152,42 @@ public class ServerFacade {
     }
 
     public String list(String[] params) throws ResponseException {
-        return "";
+        ignoreAdditionalParametersMessage(params);
+
+        try {
+            String urlString = serverUrl + "/game";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(urlString))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .GET()
+                    .header("Authorization", authToken)
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                var responseBody = serializer.fromJson(response.body(), GameListResponse.class);
+                StringBuilder stringBuilder = new StringBuilder();
+                List<Game> games = responseBody.getGames();
+
+                int count = 1;
+                for (Game game : games) {
+                    gameIDs.put(count, game.gameID());
+                    stringBuilder.append("\n").append(count).append(". ").append(game.gameName())
+                            .append("\nWHITE: ").append(game.whiteUsername() == null ? "" : game.whiteUsername())
+                            .append("\nBLACK: ").append(game.blackUsername() == null ? "" : game.blackUsername()).append("\n");
+                    count++;
+                }
+                return stringBuilder.toString();
+
+            } else {
+                var responseBody = serializer.fromJson(response.body(), Map.class);
+                throw new ResponseException(responseBody.get("message").toString());
+            }
+
+        } catch (URISyntaxException | IOException | InterruptedException ex) {
+            throw new RuntimeException("Failure in HTTP: " + ex.getMessage());
+        }
     }
 
     public String join (String[] params) throws InputException, ResponseException {
@@ -174,6 +208,12 @@ public class ServerFacade {
             return true;
         } else {
             throw new ResponseException(responseBody.get("message").toString());
+        }
+    }
+
+    private void ignoreAdditionalParametersMessage(String[] params) {
+        if (params.length > 0) {
+            System.out.println(SET_TEXT_COLOR_RED + "Ignoring additional provided parameters." + RESET_TEXT_COLOR);
         }
     }
 }
