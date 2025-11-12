@@ -2,10 +2,5 @@ package facades;
 
 import java.util.List;
 
-public class GameListResponse {
-    List<Game> games;
-
-    public List<Game> getGames() {
-        return games;
-    }
+public record GameListResponse(List<Game> games) {
 }

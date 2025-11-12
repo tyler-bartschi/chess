@@ -169,10 +169,10 @@ public class ServerFacade {
             if (response.statusCode() == 200) {
                 var responseBody = serializer.fromJson(response.body(), GameListResponse.class);
                 StringBuilder stringBuilder = new StringBuilder();
-                List<Game> games = responseBody.getGames();
+                List<Game> games = responseBody.games();
 
                 if (games.isEmpty()) {
-                    return "No games created yet.";
+                    return SET_TEXT_COLOR_GREEN + "No games created yet.\n";
                 }
 
                 int count = 1;
