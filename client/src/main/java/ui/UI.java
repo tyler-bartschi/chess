@@ -36,7 +36,7 @@ public class UI {
 
             try {
                 running = evaluate(line);
-            } catch (InputException | ResponseException ex) {
+            } catch (InputException | ResponseException | RuntimeException ex) {
                 printErrorMessage(ex.getMessage());
             } catch (Throwable ex) {
                 printErrorMessage("An unidentified error occurred. Please try again.");
