@@ -23,8 +23,8 @@ public class ServerFacade {
     private final BoardRenderer boardRenderer;
     private final HttpClient httpClient;
     private final Gson serializer;
-
     private final String serverUrl;
+
     private String authToken;
     private String username;
     private final HashMap<Integer, Integer> gameIDs;
