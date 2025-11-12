@@ -10,6 +10,7 @@ public class ServerFacade {
     private final String serverUrl;
     private String authToken;
     private String username;
+    // add a table keeping track of numbers and the corresponding games when list games is called
 
 
     public ServerFacade(int port) {
@@ -26,6 +27,7 @@ public class ServerFacade {
     }
 
     public String logout(String[] params) throws ResponseException {
+        // invalidate all fields
         return "";
     }
 

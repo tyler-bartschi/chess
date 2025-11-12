@@ -146,13 +146,13 @@ public class UI {
         state = AuthState.UNAUTHENTICATED;
     }
 
-    private void throwIfUnauthenticated(String message) throws InputException, ResponseException {
+    private void throwIfUnauthenticated(String message) throws InputException {
         if (state == AuthState.UNAUTHENTICATED) {
             throw new InputException(message);
         }
     }
 
-    private void throwIfAuthenticated(String message) throws InputException, ResponseException {
+    private void throwIfAuthenticated(String message) throws InputException {
         if (state == AuthState.AUTHENTICATED) {
             throw new InputException(message);
         }
