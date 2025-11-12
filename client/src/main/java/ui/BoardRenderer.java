@@ -68,7 +68,6 @@ public class BoardRenderer {
             return getPieceString(pieceType, WHITE_KING, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK, WHITE_PAWN);
         }
         return getPieceString(pieceType, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK, BLACK_PAWN);
-
     }
 
     private String getPieceString(ChessPiece.PieceType pieceType, String king, String queen, String bishop, String knight, String rook, String pawn) {
@@ -89,7 +88,6 @@ public class BoardRenderer {
             int newIndex = original.length - i - 1;
             newArray[newIndex] = original[i];
         }
-
         return newArray;
     }
 }

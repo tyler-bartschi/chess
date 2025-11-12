@@ -177,10 +177,13 @@ public class ServerFacade {
 
                 int count = 1;
                 for (Game game : games) {
+                    if (count > 1) {
+                        stringBuilder.append("\n");
+                    }
                     gameIDs.put(count, game.gameID());
-                    stringBuilder.append("\n").append(count).append(". ").append(game.gameName())
-                            .append("\nWHITE: ").append(game.whiteUsername() == null ? "" : game.whiteUsername())
-                            .append("\nBLACK: ").append(game.blackUsername() == null ? "" : game.blackUsername()).append("\n");
+                    stringBuilder.append(SET_TEXT_COLOR_GREEN).append(count).append(RESET_TEXT_COLOR).append(". ").append(game.gameName())
+                            .append("\n   WHITE: ").append(game.whiteUsername() == null ? "" : game.whiteUsername())
+                            .append("\n   BLACK: ").append(game.blackUsername() == null ? "" : game.blackUsername()).append("\n");
                     count++;
                 }
                 return stringBuilder.toString();
@@ -202,11 +205,11 @@ public class ServerFacade {
         if (!params[0].matches("\\d+")) {
             throw new InputException("Must provide a valid <ID>");
         }
+        if (!gameIDs.containsKey(Integer.parseInt(params[0]))) {
+            throw new InputException("Must provide a valid <ID>");
+        }
 
         try {
-            if (!gameIDs.containsKey(Integer.parseInt(params[0]))) {
-                throw new InputException("Must provide a valid <ID>");
-            }
             var body = Map.of("playerColor", params[1], "gameID", gameIDs.get(Integer.parseInt(params[0])));
             String json = serializer.toJson(body);
             String urlString = serverUrl + "/game";
@@ -221,7 +224,8 @@ public class ServerFacade {
 
             if (response.statusCode() == 200) {
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(username).append(" successfully joined as ").append(params[1].toUpperCase()).append("\n\n");
+                stringBuilder.append(SET_TEXT_COLOR_GREEN).append(username).append(" successfully joined as ").
+                        append(params[1].toUpperCase()).append(RESET_TEXT_COLOR).append("\n\n");
 
                 ChessBoard board = new ChessBoard();
                 board.resetBoard();
@@ -258,7 +262,8 @@ public class ServerFacade {
         }
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(username).append(" observing game ").append(params[0]).append("\n\n");
+        stringBuilder.append(SET_TEXT_COLOR_GREEN).append(username).append(" observing game ").
+                append(params[0]).append(RESET_TEXT_COLOR).append("\n\n");
 
         ChessBoard board = new ChessBoard();
         board.resetBoard();
@@ -279,7 +284,7 @@ public class ServerFacade {
 
     private void ignoreAdditionalParametersMessage(String[] params) {
         if (params.length > 0) {
-            System.out.println(SET_TEXT_COLOR_RED + "Ignoring additional provided parameters." + RESET_TEXT_COLOR);
+            System.out.println(SET_TEXT_COLOR_RED + "Ignoring additional provided parameters..." + RESET_TEXT_COLOR);
         }
     }
 }

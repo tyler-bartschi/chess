@@ -12,7 +12,6 @@ public class UI {
 
     private AuthState state;
     private final ServerFacade serverFacade;
-    private final BoardRenderer boardRenderer;
 
     private enum AuthState {
         UNAUTHENTICATED,
@@ -22,7 +21,6 @@ public class UI {
     public UI(int port) {
         state = AuthState.UNAUTHENTICATED;
         serverFacade = new ServerFacade(port);
-        boardRenderer = new BoardRenderer();
     }
 
     public void run() {
@@ -42,7 +40,6 @@ public class UI {
                 printErrorMessage("An unidentified error occurred. Please try again.");
             }
         }
-
         System.out.println("Thanks for playing!");
     }
 
@@ -96,28 +93,28 @@ public class UI {
 
     private boolean login(String[] params) throws InputException, ResponseException {
         throwIfAuthenticated("You are already logged in.");
-        System.out.println(serverFacade.login(params));
+        printSuccessMessage(serverFacade.login(params));
         setStateAuthenticated();
         return true;
     }
 
     private boolean register(String[] params) throws InputException, ResponseException {
         throwIfAuthenticated("You cannot register while logged in.");
-        System.out.println(serverFacade.register(params));
+        printSuccessMessage(serverFacade.register(params));
         setStateAuthenticated();
         return true;
     }
 
     private boolean logout(String[] params) throws InputException, ResponseException {
         throwIfUnauthenticated("You are already logged out.");
-        System.out.println(serverFacade.logout(params));
+        printSuccessMessage(serverFacade.logout(params));
         setStateUnauthenticated();
         return true;
     }
 
     private boolean create(String[] params) throws InputException, ResponseException {
         throwIfUnauthenticated("Must be logged in to create a game.");
-        System.out.println(serverFacade.create(params));
+        printSuccessMessage(serverFacade.create(params));
         return true;
     }
 
@@ -165,7 +162,7 @@ public class UI {
 
     private void printErrorMessage(String msg) {
         resetTextEffects();
-        System.out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_RED + msg);
+        System.out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_RED + msg + "\n");
     }
 
     private void printBlueAndWhite(String first, String second) {
@@ -179,5 +176,9 @@ public class UI {
         } else {
             System.out.print(SET_TEXT_BOLD + "[LOGGED_IN] " + RESET_TEXT_BOLD_FAINT + ">>> ");
         }
+    }
+
+    private void printSuccessMessage(String message) {
+        System.out.println(SET_TEXT_COLOR_GREEN + message + "\n");
     }
 }
