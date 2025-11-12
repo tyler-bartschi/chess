@@ -6,11 +6,14 @@ import static ui.EscapeSequences.*;
 
 public class BoardRenderer {
 
+    private StringBuilder result;
+
     public BoardRenderer() {
 
     }
 
-    public void renderGameBoard(ChessGame.TeamColor team, ChessBoard board) {
+    public String renderGameBoard(ChessGame.TeamColor team, ChessBoard board) {
+        result = new StringBuilder();
         // white on bottom, black on top by default
         String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
         String[] numbers = {"8", "7", "6", "5", "4", "3", "2", "1"};
@@ -19,37 +22,37 @@ public class BoardRenderer {
             numbers = reverseStringArray(numbers);
         }
 
-        printLetterPositions(letters);
-        printGameBoard(numbers, board, team);
-        printLetterPositions(letters);
+        addLetterPositions(letters);
+        buildGameBoard(numbers, board, team);
+        addLetterPositions(letters);
+        return result.toString();
     }
 
-    private void printLetterPositions(String[] letters) {
-        System.out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + EMPTY);
+    private void addLetterPositions(String[] letters) {
+        result.append(SET_BG_COLOR_WHITE).append(SET_TEXT_COLOR_BLACK).append(EMPTY);
         for (String letter : letters) {
-            System.out.print(" " + letter + " ");
+            result.append(" ").append(letter).append(" ");
         }
-
-        System.out.println(EMPTY + RESET_BG_COLOR + RESET_TEXT_COLOR);
+        result.append(EMPTY).append(RESET_BG_COLOR).append(RESET_TEXT_COLOR).append("\n");
     }
 
-    private void printGameBoard(String[] numbers, ChessBoard board, ChessGame.TeamColor team) {
+    private void buildGameBoard(String[] numbers, ChessBoard board, ChessGame.TeamColor team) {
         for (String number : numbers) {
-            printOneLine(number, board, team);
+            buildOneLine(number, board, team);
         }
     }
 
-    private void printOneLine(String number, ChessBoard board, ChessGame.TeamColor team) {
+    private void buildOneLine(String number, ChessBoard board, ChessGame.TeamColor team) {
         int num = Integer.parseInt(number);
         boolean isWhite = (team == ChessGame.TeamColor.WHITE) == (num % 2 == 0);
         String printableNum = " " + number + " ";
-        System.out.print(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + printableNum + RESET_TEXT_COLOR);
+        result.append(SET_BG_COLOR_WHITE).append(SET_TEXT_COLOR_BLACK).append(printableNum).append(RESET_TEXT_COLOR);
         for (int i = 1; i < 9; i++) {
             String bgColor = isWhite ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
-            System.out.print(bgColor + getPieceForPosition(num, i, board));
+            result.append(bgColor).append(getPieceForPosition(num, i, board));
             isWhite = !isWhite;
         }
-        System.out.println(SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + printableNum + RESET_BG_COLOR + RESET_TEXT_COLOR);
+        result.append(SET_BG_COLOR_WHITE).append(SET_TEXT_COLOR_BLACK).append(printableNum).append(RESET_BG_COLOR).append(RESET_TEXT_COLOR).append("\n");
     }
 
     private String getPieceForPosition(int row, int col, ChessBoard board) {

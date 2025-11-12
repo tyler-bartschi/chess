@@ -60,9 +60,9 @@ public class UI {
             case "help" -> help();
             case "login" -> login(rawParams);
             case "register" -> register(rawParams);
-            case "logout" -> logout();
-            case "create" -> create(params);
-            case "list" -> list();
+            case "logout" -> logout(params);
+            case "create" -> create(rawParams);
+            case "list" -> list(params);
             case "join" -> join(params);
             case "observe" -> observe(params);
             case "quit" -> false;
@@ -81,7 +81,7 @@ public class UI {
         }
 
         if (state == AuthState.AUTHENTICATED) {
-            printBlueAndWhite("create <NAME> ", "- create a game, NAME will be made all lower case");
+            printBlueAndWhite("create <NAME> ", "- create a game");
             printBlueAndWhite("list ", "- list all games");
             printBlueAndWhite("join <ID> [WHITE|BLACK] ", "- join a game");
             printBlueAndWhite("observe <ID> ", "- observe a game");
@@ -95,49 +95,55 @@ public class UI {
 
     private boolean login(String[] params) throws InputException, ResponseException {
         throwIfAuthenticated("You are already logged in.");
+        System.out.println(serverFacade.login(params));
+        setStateAuthenticated();
         return true;
     }
 
     private boolean register(String[] params) throws InputException, ResponseException {
         throwIfAuthenticated("You cannot register while logged in.");
-        state = AuthState.AUTHENTICATED;
+        System.out.println(serverFacade.register(params));
+        setStateAuthenticated();
         return true;
     }
 
-    private boolean logout() throws InputException, ResponseException {
+    private boolean logout(String[] params) throws InputException, ResponseException {
         throwIfUnauthenticated("You are already logged out.");
-        state = AuthState.UNAUTHENTICATED;
+        System.out.println(serverFacade.logout(params));
+        setStateUnauthenticated();
         return true;
     }
 
     private boolean create(String[] params) throws InputException, ResponseException {
         throwIfUnauthenticated("Must be logged in to create a game.");
+        System.out.println(serverFacade.create(params));
         return true;
     }
 
-    private boolean list() throws InputException, ResponseException {
+    private boolean list(String[] params) throws InputException, ResponseException {
         throwIfUnauthenticated("Must be logged in to list games.");
+        System.out.println(serverFacade.list(params));
         return true;
     }
 
     private boolean join(String[] params) throws InputException, ResponseException {
         throwIfUnauthenticated("Must be logged in to join a game");
-        resetTextEffects();
-
-        // testing board rendering
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
-        System.out.println("WHITE CHESSBOARD");
-        boardRenderer.renderGameBoard(ChessGame.TeamColor.WHITE, board);
-        System.out.println("\nBLACK CHESSBOARD");
-        boardRenderer.renderGameBoard(ChessGame.TeamColor.BLACK, board);
-
+        System.out.println(serverFacade.join(params));
         return true;
     }
 
     private boolean observe(String[] params) throws InputException, ResponseException {
         throwIfUnauthenticated("Must be logged in to observe a game.");
+        System.out.println(serverFacade.observe(params));
         return true;
+    }
+
+    private void setStateAuthenticated() {
+        state = AuthState.AUTHENTICATED;
+    }
+
+    private void setStateUnauthenticated() {
+        state = AuthState.UNAUTHENTICATED;
     }
 
     private void throwIfUnauthenticated(String message) throws InputException, ResponseException {
