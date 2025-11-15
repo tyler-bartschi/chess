@@ -62,10 +62,21 @@ public class UI {
             case "list" -> list(params);
             case "join" -> join(params);
             case "observe" -> observe(params);
-            case "quit" -> false;
+            case "quit" -> quit();
             default ->
                     throw new InputException("'" + cmd + "'" + " is not a recognized command. Run 'help' to see a list of available commands.");
         };
+    }
+
+    private boolean quit() {
+        if (state == AuthState.AUTHENTICATED) {
+            try {
+                logout(new String[]{});
+            } catch (Throwable ignored) {
+            }
+        }
+        resetTextEffects();
+        return false;
     }
 
     private boolean help() {
