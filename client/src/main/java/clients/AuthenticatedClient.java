@@ -74,6 +74,16 @@ public class AuthenticatedClient implements Client {
 
     private void list(String[] params) throws InputException, ResponseException {
         // make it so that one of the params can be a number, the number of games to list
+        if (params.length > 1) {
+            throw new InputException("Too many parameters provide. 'list' can only accept <NUMBER>, the number of games to list");
+        }
+        int numGames = -1;
+        if (params.length == 1) {
+            verifyGameNum(params[0]);
+            numGames = Integer.parseInt(params[0]);
+        }
+
+        printSuccessMessage(serverFacade.list(numGames));
     }
 
     private void join(String[] params) throws InputException, ResponseException {
@@ -101,6 +111,12 @@ public class AuthenticatedClient implements Client {
     private void verifyID(String id) throws InputException {
         if (!id.matches("\\d+")) {
             throw new InputException("Must provide a number as an <ID>");
+        }
+    }
+
+    private void verifyGameNum(String gameNum) throws InputException {
+        if (!gameNum.matches("\\d+")) {
+            throw new InputException("Must provide a number for <NUMBER>");
         }
     }
 }

@@ -133,7 +133,7 @@ public class ServerFacadeTests {
         addGameToDatabase(gameName1);
         addGameToDatabase(gameName2);
 
-        String result = assertDoesNotThrow(() -> facade.list(new String[]{}));
+        String result = assertDoesNotThrow(() -> facade.list(-1));
         assertNotNull(result);
         assertContains(gameName1, result);
         assertContains(gameName2, result);
@@ -144,7 +144,7 @@ public class ServerFacadeTests {
     public void listSad() {
         addUserToDatabase("username", "password");
         logoutUser();
-        assertThrows(ResponseException.class, () -> facade.list(new String[]{}));
+        assertThrows(ResponseException.class, () -> facade.list(-1));
     }
 
     @Test
@@ -225,6 +225,6 @@ public class ServerFacadeTests {
     }
 
     private String listGames() {
-        return assertDoesNotThrow(() -> facade.list(new String[]{}));
+        return assertDoesNotThrow(() -> facade.list(-1));
     }
 }

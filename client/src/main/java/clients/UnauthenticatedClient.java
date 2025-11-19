@@ -115,16 +115,5 @@ public class UnauthenticatedClient implements Client {
 //        return true;
 //    }
 //
-//    private boolean join(String[] params) throws InputException, ResponseException {
-//        throwIfUnauthenticated("Must be logged in to join a game");
-//        System.out.println(serverFacade.join(params));
-//        return true;
-//    }
-//
-//    private boolean observe(String[] params) throws InputException, ResponseException {
-//        throwIfUnauthenticated("Must be logged in to observe a game.");
-//        System.out.println(serverFacade.observe(params));
-//        return true;
-//    }
 
 }

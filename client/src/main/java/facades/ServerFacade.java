@@ -141,9 +141,7 @@ public class ServerFacade {
         }
     }
 
-    public String list(String[] params) throws ResponseException {
-        ignoreAdditionalParametersMessage(params);
-
+    public String list(int numGames) throws ResponseException {
         try {
             String urlString = serverUrl + "/game";
             HttpRequest request = HttpRequest.newBuilder()
@@ -164,17 +162,12 @@ public class ServerFacade {
                     return SET_TEXT_COLOR_GREEN + "No games created yet.\n";
                 }
 
-                int count = 1;
-                for (Game game : games) {
-                    if (count > 1) {
-                        stringBuilder.append("\n");
-                    }
-                    gameIDs.put(count, game.gameID());
-                    stringBuilder.append(SET_TEXT_COLOR_GREEN).append(count).append(RESET_TEXT_COLOR).append(". ").append(game.gameName())
-                            .append("\n   WHITE: ").append(game.whiteUsername() == null ? "" : game.whiteUsername())
-                            .append("\n   BLACK: ").append(game.blackUsername() == null ? "" : game.blackUsername()).append("\n");
-                    count++;
+                if (numGames == -1 || numGames > games.size()) {
+                    numGames = games.size();
                 }
+
+                buildListResponse(numGames, games, stringBuilder);
+
                 return stringBuilder.toString();
 
             } else {
@@ -267,9 +260,20 @@ public class ServerFacade {
         }
     }
 
-    private void ignoreAdditionalParametersMessage(String[] params) {
-        if (params.length > 0) {
-            System.out.println(SET_TEXT_COLOR_RED + "Ignoring additional provided parameters..." + RESET_TEXT_COLOR);
+    private void buildListResponse(int numGames, List<Game> games, StringBuilder stringBuilder) {
+        int count = 1;
+        for (Game game : games) {
+            if (count > 1) {
+                stringBuilder.append("\n");
+            }
+            if (count > numGames) {
+                break;
+            }
+            gameIDs.put(count, game.gameID());
+            stringBuilder.append(SET_TEXT_COLOR_GREEN).append(count).append(RESET_TEXT_COLOR).append(". ").append(game.gameName())
+                    .append("\n   WHITE: ").append(game.whiteUsername() == null ? "" : game.whiteUsername())
+                    .append("\n   BLACK: ").append(game.blackUsername() == null ? "" : game.blackUsername()).append("\n");
+            count++;
         }
     }
 }
