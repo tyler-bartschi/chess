@@ -111,14 +111,9 @@ public class ServerFacade {
         }
     }
 
-    public String create(String[] params) throws InputException, ResponseException {
-        if (params.length < 1) {
-            throw new InputException("Must provide <NAME>");
-        }
-
+    public String create(CreateRequest req) throws ResponseException {
         try {
-            var body = Map.of("gameName", params[0]);
-            String json = serializer.toJson(body);
+            String json = serializer.toJson(req);
             String urlString = serverUrl + "/game";
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(urlString))
@@ -131,7 +126,7 @@ public class ServerFacade {
 
             var responseBody = serializer.fromJson(response.body(), Map.class);
             if (response.statusCode() == 200) {
-                return "Created game " + params[0];
+                return "Created game " + req.gameName();
             } else {
                 throw new ResponseException(responseBody.get("message").toString());
             }

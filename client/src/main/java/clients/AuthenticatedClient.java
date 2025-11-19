@@ -69,7 +69,13 @@ public class AuthenticatedClient implements Client {
     }
 
     private void create(String[] params) throws InputException, ResponseException {
+        if (params.length < 1) {
+            throw new InputException("Must provide <NAME>");
+        } else if (params.length > 1) {
+            throw new InputException("Too many parameters provided. Only <NAME> is required.");
+        }
 
+        printSuccessMessage(serverFacade.create(new CreateRequest(params[0])));
     }
 
     private void list(String[] params) throws InputException, ResponseException {

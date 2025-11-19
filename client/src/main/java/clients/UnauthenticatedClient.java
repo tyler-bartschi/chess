@@ -108,12 +108,5 @@ public class UnauthenticatedClient implements Client {
 //        printSuccessMessage(serverFacade.create(params));
 //        return true;
 //    }
-//
-//    private boolean list(String[] params) throws InputException, ResponseException {
-//        throwIfUnauthenticated("Must be logged in to list games.");
-//        System.out.println(serverFacade.list(params));
-//        return true;
-//    }
-//
 
 }

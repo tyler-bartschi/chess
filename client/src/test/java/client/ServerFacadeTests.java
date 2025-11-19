@@ -109,7 +109,7 @@ public class ServerFacadeTests {
     public void createHappy() {
         String gameName = "createHappyGame";
         addUserToDatabase("createUser", "createPassword");
-        String result = assertDoesNotThrow(() -> facade.create(new String[]{gameName}));
+        String result = assertDoesNotThrow(() -> facade.create(new CreateRequest(gameName)));
         assertNotNull(result);
         assertContains(gameName, result);
     }
@@ -117,10 +117,9 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("Create Failure")
     public void createSad() {
-        assertThrows(InputException.class, () -> facade.create(new String[]{}));
         addUserToDatabase("random", "random");
         logoutUser();
-        assertThrows(ResponseException.class, () -> facade.create(new String[]{"gameName"}));
+        assertThrows(ResponseException.class, () -> facade.create(new CreateRequest("gameName")));
     }
 
     @Test
@@ -217,7 +216,7 @@ public class ServerFacadeTests {
     }
 
     private void addGameToDatabase(String gameName) {
-        assertDoesNotThrow(() -> facade.create(new String[]{gameName}));
+        assertDoesNotThrow(() -> facade.create(new CreateRequest(gameName)));
     }
 
     private void logoutUser() {
