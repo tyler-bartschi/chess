@@ -4,6 +4,7 @@ import facades.*;
 import ui.InputException;
 import org.junit.jupiter.api.*;
 import server.Server;
+import facades.requests.*;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -56,7 +57,7 @@ public class ServerFacadeTests {
         String username = "loginHappyUsername";
         String password = "loginHappyPassword";
         addUserToDatabase(username, password);
-        String result = assertDoesNotThrow(() -> facade.login(new String[]{username, password}));
+        String result = assertDoesNotThrow(() -> facade.login(new LoginRequest(username, password)));
         assertNotNull(result);
         assertContains(username, result);
     }
@@ -64,15 +65,15 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("Login Failure")
     public void loginSad() {
-        assertThrows(InputException.class, () -> facade.login(new String[]{"oneThingOnly"}));
-        assertThrows(ResponseException.class, () -> facade.login(new String[]{"doesNotExist", "doesNotExist"}));
+        assertThrows(ResponseException.class, () -> facade.login(new LoginRequest("doesNotExist", "doesNotExist")));
     }
 
     @Test
     @DisplayName("Register Success")
     public void registerHappy() {
         String registerUsername = "registerHappyUser";
-        String result = assertDoesNotThrow(() -> facade.register(new String[]{registerUsername, "registerHappyPass", "registerHappyEmail"}));
+
+        String result = assertDoesNotThrow(() -> facade.register(new RegisterRequest(registerUsername, "registerHappyPass", "registerHappyEmail")));
         assertNotNull(result);
         assertContains(registerUsername, result);
     }
@@ -80,10 +81,9 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("Register Failure")
     public void registerSad() {
-        assertThrows(InputException.class, () -> facade.register(new String[]{"sadUser", "sadPass"}));
         String username = "registerAlreadyTakenUsername";
         addUserToDatabase(username, "password", "email");
-        assertThrows(ResponseException.class, () -> facade.register(new String[]{username, "password", "email"}));
+        assertThrows(ResponseException.class, () -> facade.register(new RegisterRequest(username, "password", "email")));
     }
 
     @Test
@@ -211,11 +211,11 @@ public class ServerFacadeTests {
     }
 
     private void addUserToDatabase(String username, String password, String email) {
-        assertDoesNotThrow(() -> facade.register(new String[]{username, password, email}));
+        assertDoesNotThrow(() -> facade.register(new RegisterRequest(username, password, email)));
     }
 
     private void addUserToDatabase(String username, String password) {
-        assertDoesNotThrow(() -> facade.register(new String[]{username, password, "email"}));
+        assertDoesNotThrow(() -> facade.register(new RegisterRequest(username, password, "email")));
     }
 
     private void addGameToDatabase(String gameName) {

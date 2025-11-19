@@ -1,6 +1,8 @@
 package clients;
 
+import facades.ResponseException;
 import facades.ServerFacade;
+import ui.InputException;
 import ui.UI.UICommand;
 
 public class AuthenticatedClient implements Client {
@@ -10,7 +12,7 @@ public class AuthenticatedClient implements Client {
         this.serverFacade = serverFacade;
     }
 
-    public UICommand execute(String[] tokens) {
+    public UICommand execute(String[] tokens) throws InputException, ResponseException {
         return UICommand.NO_CHANGE;
     }
 }

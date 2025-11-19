@@ -1,9 +1,14 @@
 package clients;
 
 import facades.ServerFacade;
+import facades.ResponseException;
 import ui.InputException;
 import ui.UI.UICommand;
+import facades.requests.*;
 
+import java.util.Arrays;
+
+import static utils.ClientUtils.*;
 import static ui.EscapeSequences.*;
 
 public class UnauthenticatedClient implements Client{
@@ -14,8 +19,53 @@ public class UnauthenticatedClient implements Client{
         this.serverFacade = serverFacade;
     }
 
-    public UICommand execute(String[] tokens) {
-        return UICommand.NO_CHANGE;
+    public UICommand execute(String[] tokens) throws InputException, ResponseException {
+        String cmd = tokens[0].toLowerCase();
+        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+
+        UICommand retCmd = UICommand.NO_CHANGE;
+
+        if (cmd.equals("help")) {
+            printHelp();
+        } else if (cmd.equals("login")) {
+            login(params);
+            retCmd = UICommand.SET_AUTHENTICATED;
+        } else if (cmd.equals("register")) {
+            register(params);
+            retCmd = UICommand.SET_AUTHENTICATED;
+        } else if (cmd.equals("quit")) {
+            retCmd = UICommand.END;
+        } else {
+            throw new InputException("'" + cmd + "' is not a recognized command. Run 'help' to view a list of commands");
+        }
+
+        return retCmd;
+    }
+
+    private void printHelp() {
+        printBlueAndWhite("register <USERNAME> <PASSWORD> <EMAIL> ", "- to create an account " + CASE_SENSITIVE);
+        printBlueAndWhite("login <USERNAME> <PASSWORD> ", "- login to play chess " + CASE_SENSITIVE);
+        printBlueAndWhite("quit ", "- quits the chess program");
+        printBlueAndWhite("help", " - display all possible commands");
+        System.out.println();
+    }
+
+    private void login(String[] params) throws InputException, ResponseException {
+        if (params.length < 2) {
+            throw new InputException("Must provide both <USERNAME> and <PASSWORD>");
+        } else if (params.length > 2) {
+            throw new InputException("Too many parameters provided. Please only provide <USERNAME> and <PASSWORD>");
+        }
+        printSuccessMessage(serverFacade.login(new LoginRequest(params[0], params[1])));
+    }
+
+    private void register(String[] params) throws InputException, ResponseException {
+        if (params.length < 3) {
+            throw new InputException("Must provide <USERNAME>, <PASSWORD> and <EMAIL>");
+        } else if (params.length > 3) {
+            throw new InputException("Too many parameters provided. Please only provide <USERNAME>, <PASSWORD> and <EMAIL>");
+        }
+        printSuccessMessage(serverFacade.register(new RegisterRequest(params[0], params[1], params[2])));
     }
 
 //    private boolean quit() {
@@ -107,14 +157,6 @@ public class UnauthenticatedClient implements Client{
 //        if (state == UI.AuthState.AUTHENTICATED) {
 //            throw new InputException(message);
 //        }
-//    }
-
-//    private void printBlueAndWhite(String first, String second) {
-//        System.out.println(EMPTY + SET_TEXT_COLOR_BLUE + first + SET_TEXT_COLOR_WHITE + second);
-//    }
-
-//    private void printSuccessMessage(String message) {
-//        System.out.println(SET_TEXT_COLOR_GREEN + message + "\n");
 //    }
 
 //    return switch (cmd) {

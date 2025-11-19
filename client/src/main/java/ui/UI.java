@@ -4,7 +4,6 @@ import clients.*;
 import facades.*;
 import static utils.ClientUtils.*;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -59,6 +58,7 @@ public class UI {
                 printErrorMessage("An unidentified error occurred. Please try again.");
             }
         }
+        resetTextEffects();
         System.out.println("Thanks for playing!");
     }
 

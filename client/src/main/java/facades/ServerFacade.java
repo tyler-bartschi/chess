@@ -4,6 +4,7 @@ import chess.*;
 import com.google.gson.Gson;
 import ui.BoardRenderer;
 import ui.InputException;
+import facades.requests.*;
 
 import static ui.EscapeSequences.*;
 
@@ -37,14 +38,9 @@ public class ServerFacade {
         gameIDs = new HashMap<>();
     }
 
-    public String login(String[] params) throws InputException, ResponseException {
-        if (params.length < 2) {
-            throw new InputException("Must provide both <USERNAME> and <PASSWORD>");
-        }
-
+    public String login(LoginRequest req) throws ResponseException {
         try {
-            var body = Map.of("username", params[0], "password", params[1]);
-            String json = serializer.toJson(body);
+            String json = serializer.toJson(req);
             String urlString = serverUrl + "/session";
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(urlString))
@@ -65,14 +61,9 @@ public class ServerFacade {
         return "";
     }
 
-    public String register(String[] params) throws InputException, ResponseException {
-        if (params.length < 3) {
-            throw new InputException("Must provide <USERNAME>, <PASSWORD> and <EMAIL>");
-        }
-
+    public String register(RegisterRequest req) throws ResponseException {
         try {
-            var body = Map.of("username", params[0], "password", params[1], "email", params[2]);
-            String json = serializer.toJson(body);
+            String json = serializer.toJson(req);
             String urlString = serverUrl + "/user";
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(urlString))
