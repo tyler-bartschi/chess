@@ -9,9 +9,8 @@ import facades.requests.*;
 import java.util.Arrays;
 
 import static utils.ClientUtils.*;
-import static ui.EscapeSequences.*;
 
-public class UnauthenticatedClient implements Client{
+public class UnauthenticatedClient implements Client {
 
     private final ServerFacade serverFacade;
 
@@ -25,18 +24,19 @@ public class UnauthenticatedClient implements Client{
 
         UICommand retCmd = UICommand.NO_CHANGE;
 
-        if (cmd.equals("help")) {
-            printHelp();
-        } else if (cmd.equals("login")) {
-            login(params);
-            retCmd = UICommand.SET_AUTHENTICATED;
-        } else if (cmd.equals("register")) {
-            register(params);
-            retCmd = UICommand.SET_AUTHENTICATED;
-        } else if (cmd.equals("quit")) {
-            retCmd = UICommand.END;
-        } else {
-            throw new InputException("'" + cmd + "' is not a recognized command. Run 'help' to view a list of commands");
+        switch (cmd) {
+            case "help" -> printHelp();
+            case "login" -> {
+                login(params);
+                retCmd = UICommand.SET_AUTHENTICATED;
+            }
+            case "register" -> {
+                register(params);
+                retCmd = UICommand.SET_AUTHENTICATED;
+            }
+            case "quit" -> retCmd = UICommand.END;
+            default -> throw new InputException("'" + cmd + "' is not a recognized command in this state. " +
+                    "Run 'help' to view a list of commands");
         }
 
         return retCmd;
@@ -102,19 +102,6 @@ public class UnauthenticatedClient implements Client{
 //        return true;
 //    }
 //
-//    private boolean login(String[] params) throws InputException, ResponseException {
-//        throwIfAuthenticated("You are already logged in.");
-//        printSuccessMessage(serverFacade.login(params));
-//        setStateAuthenticated();
-//        return true;
-//    }
-//
-//    private boolean register(String[] params) throws InputException, ResponseException {
-//        throwIfAuthenticated("You cannot register while logged in.");
-//        printSuccessMessage(serverFacade.register(params));
-//        setStateAuthenticated();
-//        return true;
-//    }
 //
 //    private boolean logout(String[] params) throws InputException, ResponseException {
 //        throwIfUnauthenticated("You are already logged out.");
@@ -147,29 +134,4 @@ public class UnauthenticatedClient implements Client{
 //        return true;
 //    }
 
-//    private void throwIfUnauthenticated(String message) throws InputException {
-//        if (state == UI.AuthState.UNAUTHENTICATED) {
-//            throw new InputException(message);
-//        }
-//    }
-//
-//    private void throwIfAuthenticated(String message) throws InputException {
-//        if (state == UI.AuthState.AUTHENTICATED) {
-//            throw new InputException(message);
-//        }
-//    }
-
-//    return switch (cmd) {
-//        case "help" -> help();
-//        case "login" -> login(rawParams);
-//        case "register" -> register(rawParams);
-//        case "logout" -> logout(params);
-//        case "create" -> create(rawParams);
-//        case "list" -> list(params);
-//        case "join" -> join(params);
-//        case "observe" -> observe(params);
-//        case "quit" -> quit();
-//        default ->
-//                throw new InputException("'" + cmd + "'" + " is not a recognized command. Run 'help' to see a list of available commands.");
-//    };
 }
