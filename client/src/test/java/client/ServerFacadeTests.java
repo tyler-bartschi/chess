@@ -155,7 +155,7 @@ public class ServerFacadeTests {
         addUserToDatabase(username, "password");
         addGameToDatabase("firstGameName");
         listGames();
-        String result = assertDoesNotThrow(() -> facade.join(new String[]{"1", color}));
+        String result = assertDoesNotThrow(() -> facade.join(new JoinRequest(1, color)));
         assertNotNull(result);
         assertContains(username, result);
         assertContains(color, result);
@@ -169,17 +169,16 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("Join Failure")
     public void joinSad() {
-        assertThrows(InputException.class, () -> facade.join(new String[]{}));
         addUserToDatabase("myUsername", "myPassword");
         addGameToDatabase("firstGameName");
         listGames();
-        assertThrows(InputException.class, () -> facade.join(new String[]{"17", "white"}));
-        assertDoesNotThrow(() -> facade.join(new String[]{"1", "white"}));
+        assertThrows(InputException.class, () -> facade.join(new JoinRequest(17, "white")));
+        assertDoesNotThrow(() -> facade.join(new JoinRequest(1, "white")));
         logoutUser();
-        assertThrows(InputException.class, () -> facade.join(new String[]{"1", "white"}));
+        assertThrows(InputException.class, () -> facade.join(new JoinRequest(1, "white")));
         addUserToDatabase("aDifferentUser", "myPasswordOnceAgain");
         listGames();
-        assertThrows(ResponseException.class, () -> facade.join(new String[]{"1", "white"}));
+        assertThrows(ResponseException.class, () -> facade.join(new JoinRequest(1, "white")));
     }
 
     @Test
@@ -189,7 +188,7 @@ public class ServerFacadeTests {
         addUserToDatabase(username, "password");
         addGameToDatabase("thisGame");
         listGames();
-        String result = assertDoesNotThrow(() -> facade.observe(new String[]{"1"}));
+        String result = assertDoesNotThrow(() -> facade.observe(1));
         assertNotNull(result);
         assertContains(username, result);
         assertTrue(result.length() > 50);
@@ -198,11 +197,10 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("Observe Failure")
     public void observeSad() {
-        assertThrows(InputException.class, () -> facade.observe(new String[]{}));
         addUserToDatabase("observeSad", "password");
         addGameToDatabase("myGame");
         listGames();
-        assertThrows(InputException.class, () -> facade.observe(new String[]{"7"}));
+        assertThrows(InputException.class, () -> facade.observe(7));
         // does not yet assert authentication because no endpoint exists on the server to just get one game
     }
 

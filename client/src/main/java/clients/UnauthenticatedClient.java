@@ -103,13 +103,6 @@ public class UnauthenticatedClient implements Client {
 //    }
 //
 //
-//    private boolean logout(String[] params) throws InputException, ResponseException {
-//        throwIfUnauthenticated("You are already logged out.");
-//        printSuccessMessage(serverFacade.logout(params));
-//        setStateUnauthenticated();
-//        return true;
-//    }
-//
 //    private boolean create(String[] params) throws InputException, ResponseException {
 //        throwIfUnauthenticated("Must be logged in to create a game.");
 //        printSuccessMessage(serverFacade.create(params));

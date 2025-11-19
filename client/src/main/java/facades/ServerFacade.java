@@ -187,19 +187,12 @@ public class ServerFacade {
         }
     }
 
-    public String join(String[] params) throws InputException, ResponseException {
-        if (params.length < 2) {
-            throw new InputException("Must provide <ID> and <WHITE|BLACK>");
-        }
-        if (!params[0].matches("\\d+")) {
-            throw new InputException("Must provide a valid <ID>");
-        }
-        if (!gameIDs.containsKey(Integer.parseInt(params[0]))) {
-            throw new InputException("Must provide a valid <ID>");
-        }
+    public String join(JoinRequest req) throws InputException, ResponseException {
+        verifyMapExists();
+        verifyListID(req.listID());
 
         try {
-            var body = Map.of("playerColor", params[1], "gameID", gameIDs.get(Integer.parseInt(params[0])));
+            var body = Map.of("playerColor", req.playerColor(), "gameID", gameIDs.get(req.listID()));
             String json = serializer.toJson(body);
             String urlString = serverUrl + "/game";
             HttpRequest request = HttpRequest.newBuilder()
@@ -214,12 +207,12 @@ public class ServerFacade {
             if (response.statusCode() == 200) {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(SET_TEXT_COLOR_GREEN).append(username).append(" successfully joined as ").
-                        append(params[1].toUpperCase()).append(RESET_TEXT_COLOR).append("\n\n");
+                        append(req.playerColor().toUpperCase()).append(RESET_TEXT_COLOR).append("\n\n");
 
                 ChessBoard board = new ChessBoard();
                 board.resetBoard();
 
-                if (params[1].equalsIgnoreCase("WHITE")) {
+                if (req.playerColor().equalsIgnoreCase("WHITE")) {
                     stringBuilder.append(boardRenderer.renderGameBoard(ChessGame.TeamColor.WHITE, board));
                 } else {
                     stringBuilder.append(boardRenderer.renderGameBoard(ChessGame.TeamColor.BLACK, board));
@@ -237,27 +230,30 @@ public class ServerFacade {
         }
     }
 
-    public String observe(String[] params) throws InputException, ResponseException {
-        if (params.length < 1) {
-            throw new InputException("Must provide <ID>");
-        }
-
-        if (!params[0].matches("\\d+")) {
-            throw new InputException("Must provide a valid <ID>");
-        }
-
-        if (!gameIDs.containsKey(Integer.parseInt(params[0]))) {
-            throw new InputException("Must provide a valid <ID>");
-        }
+    public String observe(int gameID) throws InputException, ResponseException {
+        verifyMapExists();
+        verifyListID(gameID);
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(SET_TEXT_COLOR_GREEN).append(username).append(" observing game ").
-                append(params[0]).append(RESET_TEXT_COLOR).append("\n\n");
+                append(gameID).append(RESET_TEXT_COLOR).append("\n\n");
 
         ChessBoard board = new ChessBoard();
         board.resetBoard();
         stringBuilder.append(boardRenderer.renderGameBoard(ChessGame.TeamColor.WHITE, board));
         return stringBuilder.toString();
+    }
+
+    private void verifyMapExists() throws InputException {
+        if (gameIDs.isEmpty()) {
+            throw new InputException("'list' command must be run before joining or observing, or there are no games yet");
+        }
+    }
+
+    private void verifyListID(int id) throws InputException {
+        if (!gameIDs.containsKey(id)) {
+            throw new InputException("Must provide a valid <ID>");
+        }
     }
 
     private boolean processBodyForAuthentication(HttpResponse<String> response) throws ResponseException {

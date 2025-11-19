@@ -2,6 +2,7 @@ package clients;
 
 import facades.ResponseException;
 import facades.ServerFacade;
+import facades.requests.*;
 import ui.InputException;
 import ui.UI.UICommand;
 
@@ -76,11 +77,30 @@ public class AuthenticatedClient implements Client {
     }
 
     private void join(String[] params) throws InputException, ResponseException {
+        if (params.length < 2) {
+            throw new InputException("Must provide <ID> and <WHITE|BLACK>");
+        } else if (params.length > 2) {
+            throw new InputException("Too many parameters provided. Must only provide <ID> and <WHITE|BLACK>");
+        }
 
+        verifyID(params[0]);
+        printSuccessMessage(serverFacade.join(new JoinRequest(Integer.parseInt(params[0]), params[1])));
     }
 
     private void observe(String[] params) throws InputException, ResponseException {
+        if (params.length < 1) {
+            throw new InputException("Must provide <ID>");
+        } else if (params.length > 1) {
+            throw new InputException("Too many parameters provided. 'observe' only requires <ID>");
+        }
 
+        verifyID(params[0]);
+        printSuccessMessage(serverFacade.observe(Integer.parseInt(params[0])));
     }
 
+    private void verifyID(String id) throws InputException {
+        if (!id.matches("\\d+")) {
+            throw new InputException("Must provide a number as an <ID>");
+        }
+    }
 }
