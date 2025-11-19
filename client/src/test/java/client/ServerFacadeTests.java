@@ -91,7 +91,7 @@ public class ServerFacadeTests {
     public void logoutHappy() {
         String username = "logoutUsername";
         addUserToDatabase(username, "logoutPassword", "logoutEmail");
-        String result = assertDoesNotThrow(() -> facade.logout(new String[]{}));
+        String result = assertDoesNotThrow(() -> facade.logout());
         assertNotNull(result);
         assertContains(username, result);
     }
@@ -100,8 +100,8 @@ public class ServerFacadeTests {
     @DisplayName("Logout Failure")
     public void logoutSad() {
         addUserToDatabase("random", "random");
-        assertDoesNotThrow(() -> facade.logout(new String[]{}));
-        assertThrows(ResponseException.class, () -> facade.logout(new String[]{}));
+        assertDoesNotThrow(() -> facade.logout());
+        assertThrows(ResponseException.class, () -> facade.logout());
     }
 
     @Test
@@ -223,7 +223,7 @@ public class ServerFacadeTests {
     }
 
     private void logoutUser() {
-        assertDoesNotThrow(() -> facade.logout(new String[]{}));
+        assertDoesNotThrow(() -> facade.logout());
     }
 
     private String listGames() {

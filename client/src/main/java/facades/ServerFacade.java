@@ -83,9 +83,7 @@ public class ServerFacade {
         return "";
     }
 
-    public String logout(String[] params) throws ResponseException {
-        ignoreAdditionalParametersMessage(params);
-
+    public String logout() throws ResponseException {
         try {
             String urlString = serverUrl + "/session";
             HttpRequest request = HttpRequest.newBuilder()

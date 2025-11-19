@@ -36,15 +36,15 @@ public class UnauthenticatedClient implements Client {
             }
             case "quit" -> retCmd = UICommand.END;
             default -> throw new InputException("'" + cmd + "' is not a recognized command in this state. " +
-                    "Run 'help' to view a list of commands");
+                    "Run 'help' to view a list of available commands");
         }
 
         return retCmd;
     }
 
     private void printHelp() {
-        printBlueAndWhite("register <USERNAME> <PASSWORD> <EMAIL> ", "- to create an account " + CASE_SENSITIVE);
-        printBlueAndWhite("login <USERNAME> <PASSWORD> ", "- login to play chess " + CASE_SENSITIVE);
+        printBlueAndWhite("register <USERNAME> <PASSWORD> <EMAIL> ", "- to create an account ");
+        printBlueAndWhite("login <USERNAME> <PASSWORD> ", "- login to play chess ");
         printBlueAndWhite("quit ", "- quits the chess program");
         printBlueAndWhite("help", " - display all possible commands");
         System.out.println();
