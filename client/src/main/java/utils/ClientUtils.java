@@ -15,13 +15,4 @@ public class ClientUtils {
     public static void printBlueAndWhite(String first, String second) {
         System.out.println(EMPTY + SET_TEXT_COLOR_BLUE + first + SET_TEXT_COLOR_WHITE + second);
     }
-
-    public static String[] makeArrayLower(String[] tokens) {
-        String[] newTokens = new String[tokens.length];
-        for (int i = 0; i < tokens.length; i++) {
-            newTokens[i] = tokens[i].toLowerCase();
-        }
-        return newTokens;
-    }
-
 }
