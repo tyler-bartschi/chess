@@ -67,46 +67,4 @@ public class UnauthenticatedClient implements Client {
         }
         printSuccessMessage(serverFacade.register(new RegisterRequest(params[0], params[1], params[2])));
     }
-
-//    private boolean quit() {
-//        if (state == UI.AuthState.AUTHENTICATED) {
-//            try {
-//                logout(new String[]{});
-//            } catch (Throwable ignored) {
-//            }
-//        }
-//        resetTextEffects();
-//        return false;
-//    }
-//
-//    private boolean help() {
-//        String caseSensitive = SET_TEXT_COLOR_MAGENTA + "NOTE: fields surrounded by <> are "
-//                + SET_TEXT_BOLD + "case sensitive" + RESET_TEXT_BOLD_FAINT;
-//        if (state == UI.AuthState.UNAUTHENTICATED) {
-//            printBlueAndWhite("register <USERNAME> <PASSWORD> <EMAIL> ", "- to create an account " + caseSensitive);
-//            printBlueAndWhite("login <USERNAME> <PASSWORD> ", "- login to play chess " + caseSensitive);
-//            printBlueAndWhite("quit ", "- quits the chess program");
-//            printBlueAndWhite("help", " - display all possible commands");
-//        }
-//
-//        if (state == UI.AuthState.AUTHENTICATED) {
-//            printBlueAndWhite("create <NAME> ", "- create a game");
-//            printBlueAndWhite("list ", "- list all games");
-//            printBlueAndWhite("join <ID> [WHITE|BLACK] ", "- join a game");
-//            printBlueAndWhite("observe <ID> ", "- observe a game");
-//            printBlueAndWhite("logout ", "- logs out of the chess program");
-//            printBlueAndWhite("quit ", "- quits the chess program");
-//            printBlueAndWhite("help ", "- display all possible commands");
-//        }
-//        System.out.println();
-//        return true;
-//    }
-//
-//
-//    private boolean create(String[] params) throws InputException, ResponseException {
-//        throwIfUnauthenticated("Must be logged in to create a game.");
-//        printSuccessMessage(serverFacade.create(params));
-//        return true;
-//    }
-
 }
