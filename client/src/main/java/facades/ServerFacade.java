@@ -154,7 +154,7 @@ public class ServerFacade {
                 List<Game> games = responseBody.games();
 
                 if (games.isEmpty()) {
-                    return SET_TEXT_COLOR_GREEN + "No games created yet.\n";
+                    return SET_TEXT_COLOR_GREEN + "No games created yet.";
                 }
 
                 if (numGames == -1 || numGames > games.size()) {
@@ -258,12 +258,14 @@ public class ServerFacade {
     private void buildListResponse(int numGames, List<Game> games, StringBuilder stringBuilder) {
         int count = 1;
         for (Game game : games) {
-            if (count > 1) {
-                stringBuilder.append("\n");
-            }
             if (count > numGames) {
                 break;
             }
+
+            if (count > 1) {
+                stringBuilder.append("\n");
+            }
+
             gameIDs.put(count, game.gameID());
             stringBuilder.append(SET_TEXT_COLOR_GREEN).append(count).append(RESET_TEXT_COLOR).append(". ").append(game.gameName())
                     .append("\n   WHITE: ").append(game.whiteUsername() == null ? "" : game.whiteUsername())

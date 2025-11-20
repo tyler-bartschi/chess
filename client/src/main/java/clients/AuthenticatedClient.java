@@ -89,7 +89,7 @@ public class AuthenticatedClient implements Client {
             numGames = Integer.parseInt(params[0]);
         }
 
-        printSuccessMessage(serverFacade.list(numGames));
+        System.out.println(serverFacade.list(numGames));
     }
 
     private void join(String[] params) throws InputException, ResponseException {
