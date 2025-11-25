@@ -33,11 +33,11 @@ public class AuthenticatedClient implements Client {
             case ("list") -> list(params);
             case ("join") -> {
                 join(params);
-                // retCmd = UICommand.SET_PLAYING;
+                retCmd = UICommand.SET_PLAYING;
             }
             case ("observe") -> {
                 observe(params);
-                // retCmd = UICommand.SET_PLAYING? SET_OBSERVING?
+                retCmd = UICommand.SET_OBSERVING;
             }
             case ("quit") -> {
                 logout(new String[]{});

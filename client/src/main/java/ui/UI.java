@@ -14,7 +14,7 @@ public class UI {
     private AuthState state;
     private final Client unauthenticatedClient;
     private final Client authenticatedClient;
-    private final Client playingClient;
+    private final WebsocketClient websocketClient;
 
     private Client currentClient;
     private final ServerFacade serverFacade;
@@ -29,6 +29,7 @@ public class UI {
         SET_UNAUTHENTICATED,
         SET_AUTHENTICATED,
         SET_PLAYING,
+        SET_OBSERVING,
         NO_CHANGE,
         END
     }
@@ -38,7 +39,7 @@ public class UI {
         serverFacade = new ServerFacade(port);
         unauthenticatedClient = new UnauthenticatedClient(serverFacade);
         authenticatedClient = new AuthenticatedClient(serverFacade);
-        playingClient = new PlayingClient(serverFacade);
+        websocketClient = new WebsocketClient(serverFacade);
         currentClient = unauthenticatedClient;
     }
 
@@ -81,7 +82,10 @@ public class UI {
                 setStateAuthenticated();
                 break;
             case SET_PLAYING:
-                setStatePlaying();
+                setStateWebsocket(true);
+                break;
+            case SET_OBSERVING:
+                setStateWebsocket(false);
                 break;
             case NO_CHANGE:
                 break;
@@ -105,9 +109,11 @@ public class UI {
         currentClient = unauthenticatedClient;
     }
 
-    private void setStatePlaying() {
+    private void setStateWebsocket(boolean playing) {
         state = AuthState.PLAYING;
-        currentClient = playingClient;
+        websocketClient.setPlaying(playing);
+        currentClient = websocketClient;
+
     }
 
     private void printErrorMessage(String msg) {
