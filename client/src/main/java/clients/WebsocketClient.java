@@ -46,7 +46,12 @@ public class WebsocketClient implements Client {
     }
 
     public void printHelp() {
-        // prints the help string
+        printBlueAndWhite("redraw ", "- redraws the chess board");
+        printBlueAndWhite("leave ", "- leaves the game");
+        printBlueAndWhite("move <StartRow><StartColumn> <EndRow><EndColumn> ", "- makes a chess move");
+        printBlueAndWhite("resign ", "- forfeits the game, other player wins");
+        printBlueAndWhite("highlight <row> <column> ", "- highlights possible moves for the piece on the given row and column");
+        printBlueAndWhite("help ", "- display all possible commands");
     }
 
     public void redraw(String[] params) throws InputException {
@@ -63,6 +68,7 @@ public class WebsocketClient implements Client {
 
     public void resign(String[] params) throws InputException, ResponseException {
         // resigns from game
+        // when the game ends, append an [OVER] to the end of the game name, so the client can tell which ones have been completed
     }
 
     public void highlight(String[] params) throws InputException {
