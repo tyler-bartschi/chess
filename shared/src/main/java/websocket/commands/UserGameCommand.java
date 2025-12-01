@@ -15,14 +15,12 @@ public class UserGameCommand {
     private final CommandType commandType;
     private final String authToken;
     private final Integer gameID;
-    private final boolean isPlayer;
     private final ChessMove move;
 
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, boolean isPlayer) {
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
-        this.isPlayer = isPlayer;
         this.move = null;
     }
 
@@ -30,7 +28,6 @@ public class UserGameCommand {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
-        this.isPlayer = false;
         this.move = move;
     }
 
@@ -51,10 +48,6 @@ public class UserGameCommand {
 
     public Integer getGameID() {
         return gameID;
-    }
-
-    public boolean getIsPlayer() {
-        return isPlayer;
     }
 
     public ChessMove getMove() {
