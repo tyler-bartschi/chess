@@ -7,7 +7,6 @@ import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
-import ui.InputException;
 import websocket.commands.UserGameCommand;
 
 import java.net.URI;
