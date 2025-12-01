@@ -1,5 +1,6 @@
 package facades;
 
+import chess.ChessMove;
 import clients.WebsocketClient.ServerMessageObserver;
 import com.google.gson.Gson;
 import jakarta.websocket.ContainerProvider;
@@ -20,7 +21,7 @@ public class WebsocketFacade {
 
     private ServerMessageObserver serverMessageObserver;
     private String authToken;
-    private String username;
+    private int gameID;
 
     public WebsocketFacade(int port) {
         serverMessageObserver = null;
@@ -36,8 +37,8 @@ public class WebsocketFacade {
         this.authToken = authToken;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setGameID(int gameID) {
+        this.gameID = gameID;
     }
 
     public void createConnection() {
@@ -56,4 +57,32 @@ public class WebsocketFacade {
         }
     }
 
+    public void sendConnectCommand() throws WebsocketException {
+        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+        sendMessage(command);
+    }
+
+    public void sendMakeMoveCommand(ChessMove move) throws WebsocketException {
+        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+        sendMessage(command);
+    }
+
+    public void sendLeaveCommand() throws WebsocketException {
+        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+        sendMessage(command);
+    }
+
+    public void sendResignCommand() throws WebsocketException {
+        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+        sendMessage(command);
+    }
+
+    private void sendMessage(UserGameCommand command) throws WebsocketException {
+        String message = serializer.toJson(command);
+        try {
+            session.getBasicRemote().sendText(message);
+        } catch (Exception ex) {
+            throw new WebsocketException("An error occurred with websocket: " + ex.getMessage());
+        }
+    }
 }

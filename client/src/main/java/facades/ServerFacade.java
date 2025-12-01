@@ -28,6 +28,7 @@ public class ServerFacade {
 
     private String authToken;
     private String username;
+    private int lastJoinedGameID;
     private final HashMap<Integer, Integer> gameIDs;
 
     public ServerFacade(int port) {
@@ -38,12 +39,12 @@ public class ServerFacade {
         gameIDs = new HashMap<>();
     }
 
-    public String getUsername() {
-        return username;
-    }
-
     public String getAuthToken() {
         return authToken;
+    }
+
+    public int getGameID() {
+        return lastJoinedGameID;
     }
 
     public String login(LoginRequest req) throws ResponseException {
@@ -201,6 +202,7 @@ public class ServerFacade {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
+                lastJoinedGameID = req.listID();
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append(SET_TEXT_COLOR_GREEN).append(username).append(" successfully joined as ").
                         append(req.playerColor().toUpperCase()).append(RESET_TEXT_COLOR).append("\n\n");

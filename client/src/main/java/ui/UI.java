@@ -58,7 +58,7 @@ public class UI {
 
             try {
                 running = evaluate(line);
-            } catch (InputException | ResponseException | RuntimeException ex) {
+            } catch (InputException | ResponseException | WebsocketException | RuntimeException ex) {
                 printErrorMessage(ex.getMessage());
             } catch (Throwable ex) {
                 printErrorMessage("An unidentified error occurred. Please try again.");
@@ -72,7 +72,7 @@ public class UI {
         websocketClient.setTeamColor(color);
     }
 
-    private boolean evaluate(String line) throws InputException, ResponseException {
+    private boolean evaluate(String line) throws InputException, ResponseException, WebsocketException {
         resetTextEffects();
         String[] tokens = line.split("\\s+");
         if (tokens[0].isEmpty()) {
@@ -124,7 +124,7 @@ public class UI {
         state = AuthState.PLAYING;
         websocketClient.setPlaying(playing);
         websocketClient.setTeamColor(color);
-        websocketClient.activate(serverFacade.getUsername(), serverFacade.getAuthToken());
+        websocketClient.activate(serverFacade.getAuthToken(), serverFacade.getGameID());
         currentClient = websocketClient;
     }
 

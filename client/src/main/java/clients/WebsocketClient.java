@@ -2,6 +2,7 @@ package clients;
 
 import chess.ChessGame;
 import facades.ResponseException;
+import facades.WebsocketException;
 import facades.WebsocketFacade;
 import ui.InputException;
 import ui.UI.UICommand;
@@ -34,7 +35,7 @@ public class WebsocketClient implements Client {
 
     }
 
-    public UICommand execute(String[] tokens) throws InputException, ResponseException {
+    public UICommand execute(String[] tokens) throws InputException, WebsocketException {
         String cmd = tokens[0].toLowerCase();
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
@@ -65,11 +66,11 @@ public class WebsocketClient implements Client {
         teamColor = color;
     }
 
-    public void activate(String username, String authToken) {
+    public void activate(String authToken, int gameID) {
         // activate the websocketFacade
         websocketFacade.setServerMessageObserver(new ServerMessageObserver());
-        websocketFacade.setUsername(username);
         websocketFacade.setAuthToken(authToken);
+        websocketFacade.setGameID(gameID);
         websocketFacade.createConnection();
     }
 
@@ -93,15 +94,15 @@ public class WebsocketClient implements Client {
         boardRenderer.renderGameBoard(teamColor, currentGame.getBoard());
     }
 
-    private void leaveGame(String[] params) throws InputException, ResponseException {
+    private void leaveGame(String[] params) throws InputException, WebsocketException {
         // leaves the game
     }
 
-    private void makeMove(String[] params) throws InputException, ResponseException {
+    private void makeMove(String[] params) throws InputException, WebsocketException {
         // checks validity of move and makes move
     }
 
-    private void resign(String[] params) throws InputException, ResponseException {
+    private void resign(String[] params) throws InputException, WebsocketException {
         // resigns from game
         // when the game ends, append an [OVER] to the end of the game name, so the client can tell which ones have been completed
     }
