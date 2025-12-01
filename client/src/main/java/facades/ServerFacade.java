@@ -38,6 +38,14 @@ public class ServerFacade {
         gameIDs = new HashMap<>();
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
     public String login(LoginRequest req) throws ResponseException {
         try {
             String json = serializer.toJson(req);

@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import clients.*;
 import facades.*;
 
@@ -18,6 +19,7 @@ public class UI {
 
     private Client currentClient;
     private final ServerFacade serverFacade;
+    private final WebsocketFacade websocketFacade;
 
     private enum AuthState {
         UNAUTHENTICATED,
@@ -28,7 +30,8 @@ public class UI {
     public enum UICommand {
         SET_UNAUTHENTICATED,
         SET_AUTHENTICATED,
-        SET_PLAYING,
+        SET_PLAYING_WHITE,
+        SET_PLAYING_BLACK,
         SET_OBSERVING,
         NO_CHANGE,
         END
@@ -37,9 +40,10 @@ public class UI {
     public UI(int port) {
         state = AuthState.UNAUTHENTICATED;
         serverFacade = new ServerFacade(port);
+        websocketFacade = new WebsocketFacade(port);
         unauthenticatedClient = new UnauthenticatedClient(serverFacade);
         authenticatedClient = new AuthenticatedClient(serverFacade);
-        websocketClient = new WebsocketClient(serverFacade);
+        websocketClient = new WebsocketClient(websocketFacade);
         currentClient = unauthenticatedClient;
     }
 
@@ -64,6 +68,10 @@ public class UI {
         System.out.println("Thanks for playing!");
     }
 
+    public void setPlayerColor(ChessGame.TeamColor color) {
+        websocketClient.setTeamColor(color);
+    }
+
     private boolean evaluate(String line) throws InputException, ResponseException {
         resetTextEffects();
         String[] tokens = line.split("\\s+");
@@ -81,11 +89,14 @@ public class UI {
             case SET_AUTHENTICATED:
                 setStateAuthenticated();
                 break;
-            case SET_PLAYING:
-                setStateWebsocket(true);
+            case SET_PLAYING_WHITE:
+                setStateWebsocket(true, ChessGame.TeamColor.WHITE);
+                break;
+            case SET_PLAYING_BLACK:
+                setStateWebsocket(true, ChessGame.TeamColor.BLACK);
                 break;
             case SET_OBSERVING:
-                setStateWebsocket(false);
+                setStateWebsocket(false, ChessGame.TeamColor.WHITE);
                 break;
             case NO_CHANGE:
                 break;
@@ -109,11 +120,12 @@ public class UI {
         currentClient = unauthenticatedClient;
     }
 
-    private void setStateWebsocket(boolean playing) {
+    private void setStateWebsocket(boolean playing, ChessGame.TeamColor color) {
         state = AuthState.PLAYING;
         websocketClient.setPlaying(playing);
+        websocketClient.setTeamColor(color);
+        websocketClient.activate(serverFacade.getUsername(), serverFacade.getAuthToken());
         currentClient = websocketClient;
-
     }
 
     private void printErrorMessage(String msg) {

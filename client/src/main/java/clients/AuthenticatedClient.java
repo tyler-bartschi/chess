@@ -1,5 +1,6 @@
 package clients;
 
+import chess.ChessGame;
 import facades.ResponseException;
 import facades.ServerFacade;
 import facades.requests.*;
@@ -32,8 +33,7 @@ public class AuthenticatedClient implements Client {
             case ("create") -> create(params);
             case ("list") -> list(params);
             case ("join") -> {
-                join(params);
-                retCmd = UICommand.SET_PLAYING;
+                retCmd = join(params);
             }
             case ("observe") -> {
                 observe(params);
@@ -92,7 +92,7 @@ public class AuthenticatedClient implements Client {
         System.out.println(serverFacade.list(numGames));
     }
 
-    private void join(String[] params) throws InputException, ResponseException {
+    private UICommand join(String[] params) throws InputException, ResponseException {
         if (params.length < 2) {
             throw new InputException("Must provide <ID> and <WHITE|BLACK>");
         } else if (params.length > 2) {
@@ -101,6 +101,12 @@ public class AuthenticatedClient implements Client {
 
         verifyID(params[0]);
         printSuccessMessage(serverFacade.join(new JoinRequest(Integer.parseInt(params[0]), params[1])));
+
+        if (params[1].equalsIgnoreCase("WHITE")) {
+            return UICommand.SET_PLAYING_WHITE;
+        } else {
+            return UICommand.SET_PLAYING_BLACK;
+        }
     }
 
     private void observe(String[] params) throws InputException, ResponseException {

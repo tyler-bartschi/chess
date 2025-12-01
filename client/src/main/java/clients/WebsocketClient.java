@@ -2,20 +2,36 @@ package clients;
 
 import chess.ChessGame;
 import facades.ResponseException;
-import facades.ServerFacade;
+import facades.WebsocketFacade;
 import ui.InputException;
 import ui.UI.UICommand;
+import ui.BoardRenderer;
 import static utils.ClientUtils.*;
 
 import java.util.Arrays;
 
 public class WebsocketClient implements Client {
-    private final ServerFacade serverFacade;
+    private final WebsocketFacade websocketFacade;
+    private final BoardRenderer boardRenderer;
     private boolean playing;
-    private ChessGame currentBoard;
+    private ChessGame.TeamColor teamColor;
+    private ChessGame currentGame;
 
-    public WebsocketClient(ServerFacade serverFacade) {
-        this.serverFacade = serverFacade;
+    public WebsocketClient(WebsocketFacade websocketFacade) {
+        this.websocketFacade = websocketFacade;
+        boardRenderer = new BoardRenderer();
+        this.currentGame = null;
+    }
+
+    public class ServerMessageObserver {
+
+        public ServerMessageObserver() {
+        }
+
+        public void onMessage(String message) {
+            // parse and display server messages
+        }
+
     }
 
     public UICommand execute(String[] tokens) throws InputException, ResponseException {
@@ -45,7 +61,19 @@ public class WebsocketClient implements Client {
         this.playing = playing;
     }
 
-    public void printHelp() {
+    public void setTeamColor(ChessGame.TeamColor color) {
+        teamColor = color;
+    }
+
+    public void activate(String username, String authToken) {
+        // activate the websocketFacade
+        websocketFacade.setServerMessageObserver(new ServerMessageObserver());
+        websocketFacade.setUsername(username);
+        websocketFacade.setAuthToken(authToken);
+        websocketFacade.createConnection();
+    }
+
+    private void printHelp() {
         printBlueAndWhite("redraw ", "- redraws the chess board");
         printBlueAndWhite("leave ", "- leaves the game");
         printBlueAndWhite("move <StartRow><StartColumn> <EndRow><EndColumn> ", "- makes a chess move");
@@ -54,24 +82,31 @@ public class WebsocketClient implements Client {
         printBlueAndWhite("help ", "- display all possible commands");
     }
 
-    public void redraw(String[] params) throws InputException {
-        // prints the board again
+    private void redraw(String[] params) throws InputException {
+        if (currentGame == null) {
+            throw new InputException("No board to redraw.");
+        }
+        if (params.length != 0) {
+            throw new InputException("Too many parameters provided. 'redraw' takes no parameters");
+        }
+
+        boardRenderer.renderGameBoard(teamColor, currentGame.getBoard());
     }
 
-    public void leaveGame(String[] params) throws InputException, ResponseException {
+    private void leaveGame(String[] params) throws InputException, ResponseException {
         // leaves the game
     }
 
-    public void makeMove(String[] params) throws InputException, ResponseException {
+    private void makeMove(String[] params) throws InputException, ResponseException {
         // checks validity of move and makes move
     }
 
-    public void resign(String[] params) throws InputException, ResponseException {
+    private void resign(String[] params) throws InputException, ResponseException {
         // resigns from game
         // when the game ends, append an [OVER] to the end of the game name, so the client can tell which ones have been completed
     }
 
-    public void highlight(String[] params) throws InputException {
+    private void highlight(String[] params) throws InputException {
         // highlights the requested piece's valid moves
     }
 }
