@@ -25,21 +25,12 @@ public class WebSocketService {
     }
 
     public void connect(UserGameCommand command, Session session) throws UnauthorizedException, DataAccessException, InvalidRequestException {
-        AuthData auth;
-        GameData game;
-        try {
-            auth = getAuthAndVerify(command.getAuthToken());
-            game = getGameAndVerify(command.getGameID());
-        } catch (UnauthorizedException ex) {
-            // bad auth
-            sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, "ERROR: invalid authentication")));
-            return;
-        } catch (InvalidRequestException ex) {
-            // bad game
-            sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, "ERROR: invalid gameID")));
+        if (!checkCommand(command, session)) {
             return;
         }
 
+        AuthData auth = dataAccess.getAuthByToken(command.getAuthToken());
+        GameData game = dataAccess.getGame(command.getGameID());
 
         int gameID = command.getGameID();
         String username = auth.username();
@@ -52,23 +43,56 @@ public class WebSocketService {
         connectionContainer.sendToAllExcept(gameID, username, serializedNotification);
     }
 
-    public void makeMove(UserGameCommand command) {
+    public void makeMove(UserGameCommand command, Session session) {
 
     }
 
-    public void leave(UserGameCommand command) throws UnauthorizedException, DataAccessException, InvalidRequestException {
-        AuthData auth = getAuthAndVerify(command.getAuthToken());
-        GameData game = getGameAndVerify(command.getGameID());
+    public void leave(UserGameCommand command, Session session) throws UnauthorizedException, DataAccessException, InvalidRequestException {
+        if (!checkCommand(command, session)) {
+            return;
+        }
 
+        AuthData auth = dataAccess.getAuthByToken(command.getAuthToken());
+        GameData game = dataAccess.getGame(command.getGameID());
         int gameID = command.getGameID();
         String username = auth.username();
 
         connectionContainer.removeUser(gameID, username);
 
+        String notification;
+        if (game.whiteUsername() != null && game.whiteUsername().equals(username)) {
+            GameData newGame = new GameData(gameID, null, game.blackUsername(), game.gameName(), game.game());
+            dataAccess.updateGame(gameID, newGame);
+            notification = username + " has left the game. Was WHITE";
+        } else if (game.blackUsername() != null && game.blackUsername().equals(username)) {
+            GameData newGame = new GameData(gameID, game.whiteUsername(), null, game.gameName(), game.game());
+            dataAccess.updateGame(gameID, newGame);
+            notification = username + " has left the game. Was BLACK";
+        } else {
+            notification = username + " has left the game. Was observer";
+        }
+
+        connectionContainer.sendToAll(gameID, serializer.toJson(new NotificationMessage(NOTIFICATION, notification)));
     }
 
-    public void resign(UserGameCommand command) {
+    public void resign(UserGameCommand command, Session session) {
 
+    }
+
+    private boolean checkCommand(UserGameCommand command, Session session) throws DataAccessException {
+        try {
+            AuthData auth = getAuthAndVerify(command.getAuthToken());
+            GameData game = getGameAndVerify(command.getGameID());
+        } catch (UnauthorizedException ex) {
+            // bad auth
+            sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, "ERROR: invalid authentication")));
+            return false;
+        } catch (InvalidRequestException ex) {
+            // bad game
+            sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, "ERROR: invalid gameID")));
+            return false;
+        }
+        return true;
     }
 
     private AuthData getAuthAndVerify(String authToken) throws UnauthorizedException, DataAccessException {

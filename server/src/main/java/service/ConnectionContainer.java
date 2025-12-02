@@ -34,10 +34,15 @@ public class ConnectionContainer {
         checkIfGameExists(gameID);
         ArrayList<Tuple> users = gameTracker.get(gameID);
 
+        Tuple temp = null;
         for (Tuple user : users) {
             if (user.username().equals(username)) {
-                users.remove(new Tuple(username, user.session()));
+                temp = new Tuple(username, user.session());
             }
+        }
+
+        if (temp != null) {
+            users.remove(temp);
         }
     }
 

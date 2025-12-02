@@ -35,9 +35,9 @@ public class WebSocketHandler extends AuthVerificationHandler {
 
         switch (command.getCommandType()) {
             case UserGameCommand.CommandType.CONNECT -> webSocketService.connect(command, ctx.session);
-            case UserGameCommand.CommandType.MAKE_MOVE -> webSocketService.makeMove(command);
-            case UserGameCommand.CommandType.LEAVE -> webSocketService.leave(command);
-            case UserGameCommand.CommandType.RESIGN -> webSocketService.resign(command);
+            case UserGameCommand.CommandType.MAKE_MOVE -> webSocketService.makeMove(command, ctx.session);
+            case UserGameCommand.CommandType.LEAVE -> webSocketService.leave(command, ctx.session);
+            case UserGameCommand.CommandType.RESIGN -> webSocketService.resign(command, ctx.session);
         }
 
     }
