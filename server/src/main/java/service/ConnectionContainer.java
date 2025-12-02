@@ -30,9 +30,15 @@ public class ConnectionContainer {
         gameTracker.get(gameID).add(new Tuple(username, session));
     }
 
-    public void removeUser(int gameID, String username, Session session) {
+    public void removeUser(int gameID, String username) {
         checkIfGameExists(gameID);
-        gameTracker.get(gameID).remove(new Tuple(username, session));
+        ArrayList<Tuple> users = gameTracker.get(gameID);
+
+        for (Tuple user : users) {
+            if (user.username().equals(username)) {
+                users.remove(new Tuple(username, user.session()));
+            }
+        }
     }
 
     public void sendToAll(int gameID, String message) {

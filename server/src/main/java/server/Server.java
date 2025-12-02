@@ -27,7 +27,7 @@ public class Server {
         // initialize services
         final UserService userService = new UserService(dataAccess);
         final GameService gameService = new GameService(dataAccess);
-        final WebSocketService webSocketService = new WebSocketService(dataAccess);
+        final WebSocketService webSocketService = new WebSocketService(dataAccess, serializer);
 
         // initialize handlers
         final ClearHandler clearHandler = new ClearHandler(userService);

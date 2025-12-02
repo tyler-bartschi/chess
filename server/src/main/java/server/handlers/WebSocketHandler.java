@@ -1,8 +1,11 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.websocket.WsConfig;
 import io.javalin.websocket.WsMessageContext;
+import server.exceptions.InvalidRequestException;
+import server.exceptions.UnauthorizedException;
 import service.WebSocketService;
 import websocket.commands.UserGameCommand;
 
@@ -25,9 +28,10 @@ public class WebSocketHandler extends AuthVerificationHandler {
         ws.onClose(_ -> System.out.println("Websocket closed"));
     }
 
-    public void onMessage(WsMessageContext ctx) {
+    public void onMessage(WsMessageContext ctx) throws UnauthorizedException, DataAccessException, InvalidRequestException {
         // for now, it just echoes what is received
         UserGameCommand command  = serializer.fromJson(ctx.message(), UserGameCommand.class);
+        verifyAuth(command.getAuthToken());
 
         switch (command.getCommandType()) {
             case UserGameCommand.CommandType.CONNECT -> webSocketService.connect(command, ctx.session);
