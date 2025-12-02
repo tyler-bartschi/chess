@@ -3,15 +3,12 @@ package facades;
 import chess.ChessMove;
 import clients.WebsocketClient.ServerMessageObserver;
 import com.google.gson.Gson;
-import jakarta.websocket.ContainerProvider;
-import jakarta.websocket.MessageHandler;
-import jakarta.websocket.Session;
-import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
 
 import java.net.URI;
 
-public class WebsocketFacade {
+public class WebsocketFacade extends Endpoint {
 
     private Session session;
 
@@ -52,6 +49,7 @@ public class WebsocketFacade {
                 }
             });
         } catch (Throwable ex) {
+            System.out.println("here");
             throw new RuntimeException(ex.getMessage(), ex);
         }
     }
@@ -74,6 +72,11 @@ public class WebsocketFacade {
     public void sendResignCommand() throws WebsocketException {
         UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
         sendMessage(command);
+    }
+
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
+        // don't do anything with it apparently
     }
 
     private void sendMessage(UserGameCommand command) throws WebsocketException {

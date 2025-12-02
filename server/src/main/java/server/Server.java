@@ -35,6 +35,7 @@ public class Server {
         final CreateGameHandler createGameHandler = new CreateGameHandler(gameService, serializer);
         final JoinGameHandler joinGameHandler = new JoinGameHandler(gameService, serializer);
         final ListGamesHandler listGamesHandler = new ListGamesHandler(gameService, serializer);
+        final WebSocketHandler webSocketHandler = new WebSocketHandler(serializer);
 
 
         // initialize server
@@ -47,6 +48,7 @@ public class Server {
         server.post("game", createGameHandler::createGame);
         server.put("game", joinGameHandler::joinGame);
         server.get("game", listGamesHandler::listGames);
+        server.ws("/ws", webSocketHandler::createConnection);
 
         server.exception(InvalidRequestException.class, this::handleInvalidRequestException);
         server.exception(UnauthorizedException.class, this::handleUnauthorizedException);

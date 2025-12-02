@@ -30,7 +30,7 @@ public class WebsocketClient implements Client {
         }
 
         public void onMessage(String message) {
-            // parse and display server messages
+            System.out.println("Echoing: " + message);
         }
 
     }
@@ -96,6 +96,7 @@ public class WebsocketClient implements Client {
 
     private void leaveGame(String[] params) throws InputException, WebsocketException {
         // leaves the game
+        websocketFacade.sendLeaveCommand();
     }
 
     private void makeMove(String[] params) throws InputException, WebsocketException {
