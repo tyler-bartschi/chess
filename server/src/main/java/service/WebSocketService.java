@@ -24,8 +24,8 @@ public class WebSocketService {
         connectionContainer = new ConnectionContainer();
     }
 
-    public void connect(UserGameCommand command, Session session) throws UnauthorizedException, DataAccessException, InvalidRequestException {
-        if (!checkCommand(command, session)) {
+    public void connect(UserGameCommand command, Session session) throws DataAccessException {
+        if (checkCommand(command, session)) {
             return;
         }
 
@@ -47,8 +47,8 @@ public class WebSocketService {
 
     }
 
-    public void leave(UserGameCommand command, Session session) throws UnauthorizedException, DataAccessException, InvalidRequestException {
-        if (!checkCommand(command, session)) {
+    public void leave(UserGameCommand command, Session session) throws DataAccessException {
+        if (checkCommand(command, session)) {
             return;
         }
 
@@ -75,8 +75,21 @@ public class WebSocketService {
         connectionContainer.sendToAll(gameID, serializer.toJson(new NotificationMessage(NOTIFICATION, notification)));
     }
 
-    public void resign(UserGameCommand command, Session session) {
+    public void resign(UserGameCommand command, Session session) throws DataAccessException {
+        if (checkCommand(command, session)) {
+            return;
+        }
 
+        AuthData auth = dataAccess.getAuthByToken(command.getAuthToken());
+        GameData game = dataAccess.getGame(command.getGameID());
+        int gameID = command.getGameID();
+        String username = auth.username();
+
+        GameData newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName() + " [OVER]", game.game());
+        dataAccess.updateGame(gameID, newGame);
+
+        String notification = username + " has resigned. The game is now over.";
+        connectionContainer.sendToAll(gameID, serializer.toJson(new NotificationMessage(NOTIFICATION, notification)));
     }
 
     private boolean checkCommand(UserGameCommand command, Session session) throws DataAccessException {
@@ -86,13 +99,13 @@ public class WebSocketService {
         } catch (UnauthorizedException ex) {
             // bad auth
             sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, "ERROR: invalid authentication")));
-            return false;
+            return true;
         } catch (InvalidRequestException ex) {
             // bad game
             sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, "ERROR: invalid gameID")));
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     private AuthData getAuthAndVerify(String authToken) throws UnauthorizedException, DataAccessException {
