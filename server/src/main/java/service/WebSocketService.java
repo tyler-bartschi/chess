@@ -147,11 +147,30 @@ public class WebSocketService {
         int gameID = command.getGameID();
         String username = auth.username();
 
+        if (game.gameName() != null && game.gameName().contains("OVER")) {
+            String errorMessage = "ERROR: This game is over, you cannot resign";
+            sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, errorMessage)));
+            return;
+        }
+
+        if (isObserver(username, game)) {
+            String errorMessage = "ERROR: Cannot resign, you are an observer";
+            sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, errorMessage)));
+            return;
+        }
+
         GameData newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName() + " [OVER]", game.game());
         dataAccess.updateGame(gameID, newGame);
 
         String notification = username + " has resigned. The game is now over.";
         connectionContainer.sendToAll(gameID, serializer.toJson(new NotificationMessage(NOTIFICATION, notification)));
+    }
+
+    private boolean isObserver(String username, GameData game) {
+        if (game.whiteUsername() != null && game.whiteUsername().equals(username)) {
+            return false;
+        }
+        return game.blackUsername() == null || !game.blackUsername().equals(username);
     }
 
     private GameData setGameOver(GameData oldGame) {
