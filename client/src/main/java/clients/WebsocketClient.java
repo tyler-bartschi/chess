@@ -95,7 +95,9 @@ public class WebsocketClient implements Client {
     }
 
     private void leaveGame(String[] params) throws InputException, WebsocketException {
-        // leaves the game
+        if (params.length != 0) {
+            throw new InputException("Too many parameters provided. 'leave' takes no parameters");
+        }
         websocketFacade.sendLeaveCommand();
     }
 

@@ -9,6 +9,7 @@ import server.exceptions.*;
 import server.handlers.*;
 import service.GameService;
 import service.UserService;
+import service.WebSocketService;
 
 public class Server {
 
@@ -26,6 +27,7 @@ public class Server {
         // initialize services
         final UserService userService = new UserService(dataAccess);
         final GameService gameService = new GameService(dataAccess);
+        final WebSocketService webSocketService = new WebSocketService(dataAccess);
 
         // initialize handlers
         final ClearHandler clearHandler = new ClearHandler(userService);
@@ -35,7 +37,7 @@ public class Server {
         final CreateGameHandler createGameHandler = new CreateGameHandler(gameService, serializer);
         final JoinGameHandler joinGameHandler = new JoinGameHandler(gameService, serializer);
         final ListGamesHandler listGamesHandler = new ListGamesHandler(gameService, serializer);
-        final WebSocketHandler webSocketHandler = new WebSocketHandler(serializer);
+        final WebSocketHandler webSocketHandler = new WebSocketHandler(webSocketService, serializer);
 
 
         // initialize server
