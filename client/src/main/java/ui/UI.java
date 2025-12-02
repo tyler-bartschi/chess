@@ -68,10 +68,6 @@ public class UI {
         System.out.println("Thanks for playing!");
     }
 
-    public void setPlayerColor(ChessGame.TeamColor color) {
-        websocketClient.setTeamColor(color);
-    }
-
     private boolean evaluate(String line) throws InputException, ResponseException, WebsocketException {
         resetTextEffects();
         String[] tokens = line.split("\\s+");

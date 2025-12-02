@@ -1,8 +1,6 @@
 package clients;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import facades.ResponseException;
+import chess.*;
 import facades.WebsocketException;
 import facades.WebsocketFacade;
 import ui.InputException;
@@ -11,6 +9,8 @@ import ui.BoardRenderer;
 import static utils.ClientUtils.*;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Scanner;
 
 public class WebsocketClient implements Client {
     private final WebsocketFacade websocketFacade;
@@ -31,7 +31,7 @@ public class WebsocketClient implements Client {
         }
 
         public void onMessage(String message) {
-            System.out.println("Echoing: " + message);
+            System.out.println(message);
         }
 
     }
@@ -109,13 +109,33 @@ public class WebsocketClient implements Client {
         }
 
         ChessMove move = parseMove(params);
+        checkMoveValidity(move);
+
+        websocketFacade.sendMakeMoveCommand(move);
     }
 
     private void resign(String[] params) throws InputException, WebsocketException {
         if (params.length != 0) {
             throw new InputException("Too many parameters provided. 'resign' takes no parameters");
         }
-        // REQUIRES CONFIRMATION !!
+
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
+
+        while (running) {
+            System.out.println("WARNING: By resigning, you will lost the game. Are you sure you want to resign? (y/n)");
+            String line = scanner.nextLine();
+
+            if (isYes(line)) {
+                running = false;
+            } else if (isNo(line)) {
+                System.out.println("Canceling resignation...");
+                return;
+            } else {
+                System.out.println(line + " is not recognized. Please enter 'y' or 'n'");
+            }
+        }
+
         websocketFacade.sendResignCommand();
     }
 
@@ -123,12 +143,38 @@ public class WebsocketClient implements Client {
         // highlights the requested piece's valid moves
     }
 
+    private void checkMoveValidity(ChessMove move) throws InputException {
+        ChessGame.TeamColor currentColor = currentGame.getTeamTurn();
+        if (teamColor != currentColor) {
+            throw new InputException("It is not your turn, cannot make a move");
+        }
+
+        ChessPosition startPosition = move.getStartPosition();
+        Collection<ChessMove> possibleMoves = currentGame.validMoves(startPosition);
+        if (!possibleMoves.contains(move)) {
+            throw new InputException("That is not a valid move. Please try again.");
+        }
+    }
+
+
+    private boolean isYes(String line) {
+        return line.equalsIgnoreCase("y") || line.equalsIgnoreCase("yes");
+    }
+
+    private boolean isNo(String line) {
+        return line.equalsIgnoreCase("n") || line.equalsIgnoreCase("no");
+    }
+
     private ChessMove parseMove(String[] params) throws InputException {
+        ChessMove desiredMove = null;
+
         String startPositionRaw = params[0];
         String endPositionRaw = params[0];
 
         int startColumnNum = letterToNum(startPositionRaw.substring(1));
         int endColumnNum = letterToNum(endPositionRaw.substring(1));
+        checkBoundary(startColumnNum);
+        checkBoundary(endColumnNum);
 
         String startRowRaw = startPositionRaw.substring(0, 1);
         String endRowRaw  = startPositionRaw.substring(0, 1);
@@ -137,11 +183,67 @@ public class WebsocketClient implements Client {
             int endRowNum = Integer.parseInt(endRowRaw);
             checkBoundary(startRowNum);
             checkBoundary(endRowNum);
-            // gonna need to do a couple things: check if it's a pawn, and if it is it needs to be able to promote.
-            // either prompt for promotion piece or include it as part of the command?
+            ChessPosition startPosition = new ChessPosition(startRowNum, startColumnNum);
+            ChessPosition endPosition = new ChessPosition(endRowNum, endColumnNum);
+            if (isPawn(startPosition)) {
+                ChessPiece.PieceType promotionPiece = getPromotionPiece(startPosition);
+                desiredMove = new ChessMove(startPosition, endPosition, promotionPiece);
+            } else {
+                desiredMove = new ChessMove(startPosition, endPosition, null);
+            }
+
         } else {
             throw new InputException("One of your rows is not a valid number");
         }
+        return desiredMove;
+    }
+
+    private ChessPiece.PieceType getPromotionPiece(ChessPosition startPosition) {
+        boolean isPromoting = false;
+        if (teamColor == ChessGame.TeamColor.WHITE && startPosition.getRow() == 7) {
+            isPromoting = true;
+        } else if (startPosition.getRow() == 2) {
+            isPromoting = true;
+        }
+
+        if (isPromoting) {
+            return promptForPiece();
+        }
+        return null;
+    }
+
+    private ChessPiece.PieceType promptForPiece() {
+        System.out.println("Your pawn is going to be promoted! Please enter your desired promotion piece.");
+        ChessPiece.PieceType pieceType = null;
+
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
+        while (running) {
+            String line = scanner.nextLine();
+            pieceType = convertStringToPieceType(line);
+            if (pieceType != null) {
+                running = false;
+            }
+            System.out.println("That is not a valid piece type. Please enter: ROOK/KNIGHT/BISHOP/QUEEN");
+        }
+        return pieceType;
+    }
+
+    private ChessPiece.PieceType convertStringToPieceType(String line) {
+        line = line.toUpperCase();
+
+        return switch (line) {
+            case "ROOK" -> ChessPiece.PieceType.ROOK;
+            case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
+            case "QUEEN" -> ChessPiece.PieceType.QUEEN;
+            case "BISHOP" -> ChessPiece.PieceType.BISHOP;
+            default -> null;
+        };
+    }
+
+    private boolean isPawn(ChessPosition position) {
+        ChessPiece piece = currentGame.getBoard().getPiece(position);
+        return piece.getPieceType() == ChessPiece.PieceType.PAWN;
     }
 
     private void checkBoundary(int num) throws InputException {
