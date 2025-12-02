@@ -25,19 +25,28 @@ public class WebSocketService {
     }
 
     public void connect(UserGameCommand command, Session session) throws UnauthorizedException, DataAccessException, InvalidRequestException {
-        AuthData auth = getAuthAndVerify(command.getAuthToken());
-        GameData game = getGameAndVerify(command.getGameID());
+        AuthData auth;
+        GameData game;
+        try {
+            auth = getAuthAndVerify(command.getAuthToken());
+            game = getGameAndVerify(command.getGameID());
+        } catch (UnauthorizedException ex) {
+            // bad auth
+            sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, "ERROR: invalid authentication")));
+            return;
+        } catch (InvalidRequestException ex) {
+            // bad game
+            sendMessage(session, serializer.toJson(new ErrorMessage(ERROR, "ERROR: invalid gameID")));
+            return;
+        }
+
 
         int gameID = command.getGameID();
         String username = auth.username();
 
         connectionContainer.addUser(gameID, username, session);
         String message = serializer.toJson(new LoadGameMessage(LOAD_GAME, game.game()));
-        try {
-            session.getRemote().sendString(message);
-        } catch (Throwable ex) {
-            System.out.println("An error occured trying to send a websocket message: " + ex.getMessage());
-        }
+        sendMessage(session, message);
 
         String serializedNotification = serializer.toJson(new NotificationMessage(NOTIFICATION, notificationForConnection(game, username)));
         connectionContainer.sendToAllExcept(gameID, username, serializedNotification);
@@ -73,7 +82,7 @@ public class WebSocketService {
     private GameData getGameAndVerify(int gameID) throws InvalidRequestException, DataAccessException {
         GameData game = dataAccess.getGame(gameID);
         if (game == null) {
-            throw new InvalidRequestException("That game does not exist!");
+            throw new InvalidRequestException("Bad gameID");
         }
         return game;
     }
@@ -92,5 +101,13 @@ public class WebSocketService {
             notification = username + " joined as an observer";
         }
         return notification;
+    }
+
+    private void sendMessage(Session session, String message) {
+        try {
+            session.getRemote().sendString(message);
+        } catch (Throwable ex) {
+            System.out.println("An error occured trying to send a websocket message: " + ex.getMessage());
+        }
     }
 }
