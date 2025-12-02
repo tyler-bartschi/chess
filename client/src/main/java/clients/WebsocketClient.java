@@ -1,6 +1,7 @@
 package clients;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import facades.ResponseException;
 import facades.WebsocketException;
 import facades.WebsocketFacade;
@@ -66,12 +67,13 @@ public class WebsocketClient implements Client {
         teamColor = color;
     }
 
-    public void activate(String authToken, int gameID) {
+    public void activate(String authToken, int gameID) throws WebsocketException {
         // activate the websocketFacade
         websocketFacade.setServerMessageObserver(new ServerMessageObserver());
         websocketFacade.setAuthToken(authToken);
         websocketFacade.setGameID(gameID);
         websocketFacade.createConnection();
+        websocketFacade.sendConnectCommand();
     }
 
     private void printHelp() {
@@ -102,15 +104,63 @@ public class WebsocketClient implements Client {
     }
 
     private void makeMove(String[] params) throws InputException, WebsocketException {
-        // checks validity of move and makes move
+        if (params.length != 2) {
+            throw new InputException("'move' requires exactly two parameters. <StartRow><StartColumn> and <EndRow><EndColumn>");
+        }
+
+        ChessMove move = parseMove(params);
     }
 
     private void resign(String[] params) throws InputException, WebsocketException {
-        // resigns from game
-        // when the game ends, append an [OVER] to the end of the game name, so the client can tell which ones have been completed
+        if (params.length != 0) {
+            throw new InputException("Too many parameters provided. 'resign' takes no parameters");
+        }
+        // REQUIRES CONFIRMATION !!
+        websocketFacade.sendResignCommand();
     }
 
     private void highlight(String[] params) throws InputException {
         // highlights the requested piece's valid moves
+    }
+
+    private ChessMove parseMove(String[] params) throws InputException {
+        String startPositionRaw = params[0];
+        String endPositionRaw = params[0];
+
+        int startColumnNum = letterToNum(startPositionRaw.substring(1));
+        int endColumnNum = letterToNum(endPositionRaw.substring(1));
+
+        String startRowRaw = startPositionRaw.substring(0, 1);
+        String endRowRaw  = startPositionRaw.substring(0, 1);
+        if (startRowRaw.matches("\\d+") && endRowRaw.matches("\\d+")) {
+            int startRowNum = Integer.parseInt(startRowRaw);
+            int endRowNum = Integer.parseInt(endRowRaw);
+            checkBoundary(startRowNum);
+            checkBoundary(endRowNum);
+            // gonna need to do a couple things: check if it's a pawn, and if it is it needs to be able to promote.
+            // either prompt for promotion piece or include it as part of the command?
+        } else {
+            throw new InputException("One of your rows is not a valid number");
+        }
+    }
+
+    private void checkBoundary(int num) throws InputException {
+        if (num <= 0 || num > 8) {
+            throw new InputException(num + " is out of bounds. Must be 1-8");
+        }
+    }
+
+    private int letterToNum(String letter) throws InputException {
+        return switch (letter) {
+            case "a" -> 1;
+            case "b" -> 2;
+            case "c" -> 3;
+            case "d" -> 4;
+            case "e" -> 5;
+            case "f" -> 6;
+            case "g" -> 7;
+            case "h" -> 8;
+            default -> throw new InputException(letter + " is not a valid column");
+        };
     }
 }

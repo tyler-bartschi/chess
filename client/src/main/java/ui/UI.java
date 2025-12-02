@@ -120,7 +120,7 @@ public class UI {
         currentClient = unauthenticatedClient;
     }
 
-    private void setStateWebsocket(boolean playing, ChessGame.TeamColor color) {
+    private void setStateWebsocket(boolean playing, ChessGame.TeamColor color) throws WebsocketException {
         state = AuthState.PLAYING;
         websocketClient.setPlaying(playing);
         websocketClient.setTeamColor(color);

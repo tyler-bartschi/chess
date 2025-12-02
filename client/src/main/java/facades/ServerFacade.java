@@ -203,20 +203,9 @@ public class ServerFacade {
 
             if (response.statusCode() == 200) {
                 lastJoinedGameID = req.listID();
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(SET_TEXT_COLOR_GREEN).append(username).append(" successfully joined as ").
-                        append(req.playerColor().toUpperCase()).append(RESET_TEXT_COLOR).append("\n\n");
 
-                ChessBoard board = new ChessBoard();
-                board.resetBoard();
-
-                if (req.playerColor().equalsIgnoreCase("WHITE")) {
-                    stringBuilder.append(boardRenderer.renderGameBoard(ChessGame.TeamColor.WHITE, board));
-                } else {
-                    stringBuilder.append(boardRenderer.renderGameBoard(ChessGame.TeamColor.BLACK, board));
-                }
-
-                return stringBuilder.toString();
+                return SET_TEXT_COLOR_GREEN + username + " successfully joined as " +
+                        req.playerColor().toUpperCase() + RESET_TEXT_COLOR + "\n";
             } else {
                 var responseBody = serializer.fromJson(response.body(), Map.class);
                 throw new ResponseException(responseBody.get("message").toString());
@@ -228,18 +217,12 @@ public class ServerFacade {
         }
     }
 
-    public String observe(int gameID) throws InputException, ResponseException {
+    public String observe(int gameID) throws InputException {
         verifyMapExists();
         verifyListID(gameID);
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(SET_TEXT_COLOR_GREEN).append(username).append(" observing game ").
-                append(gameID).append(RESET_TEXT_COLOR).append("\n\n");
-
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
-        stringBuilder.append(boardRenderer.renderGameBoard(ChessGame.TeamColor.WHITE, board));
-        return stringBuilder.toString();
+        return SET_TEXT_COLOR_GREEN + username + " observing game " +
+                gameID + RESET_TEXT_COLOR + "\n";
     }
 
     private void verifyMapExists() throws InputException {
