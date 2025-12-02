@@ -81,7 +81,7 @@ public class WebSocketService {
             String loadMessage = serializer.toJson(new LoadGameMessage(LOAD_GAME, newGame));
             connectionContainer.sendToAll(gameID, loadMessage);
 
-            String notificationMessage = serializer.toJson(new NotificationMessage(NOTIFICATION,  username + " moved " + command.getMove().toString()));
+            String notificationMessage = serializer.toJson(new NotificationMessage(NOTIFICATION, username + " moved " + command.getMove().toString()));
             connectionContainer.sendToAllExcept(gameID, username, notificationMessage);
 
             GameData updatedGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), newGame);
