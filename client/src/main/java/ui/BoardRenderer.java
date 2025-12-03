@@ -65,13 +65,22 @@ public class BoardRenderer {
 
     private boolean insertIntoLine(int i, ChessBoard board, int num, ArrayList<int[]> highlights, boolean isWhite) {
         String bgColor;
-        if (highlights.contains(new int[]{num, i})) {
+        if (checkIfContains(highlights, num, i)) {
             bgColor = isWhite ? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN;
         } else {
             bgColor = isWhite ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
         }
         result.append(bgColor).append(getPieceForPosition(num, i, board));
         return !isWhite;
+    }
+
+    private boolean checkIfContains(ArrayList<int[]> highlights, int row, int col) {
+        for (int[] position : highlights) {
+            if (row == position[0] && col == position[1]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getPieceForPosition(int row, int col, ChessBoard board) {
