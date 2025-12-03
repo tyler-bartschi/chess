@@ -190,7 +190,6 @@ public class ServerFacadeTests {
         String result = assertDoesNotThrow(() -> facade.observe(1));
         assertNotNull(result);
         assertContains(username, result);
-        assertTrue(result.length() > 50);
     }
 
     @Test

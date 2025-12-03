@@ -37,12 +37,13 @@ public class ConnectionContainer {
         Tuple temp = null;
         for (Tuple user : users) {
             if (user.username().equals(username)) {
-                temp = new Tuple(username, user.session());
+                temp = user;
             }
         }
 
         if (temp != null) {
-            users.remove(temp);
+            Tuple finalTemp = temp;
+            users.removeIf(user -> user.username().equals(finalTemp.username()));
         }
     }
 

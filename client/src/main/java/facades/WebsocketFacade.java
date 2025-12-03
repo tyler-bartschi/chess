@@ -49,7 +49,6 @@ public class WebsocketFacade extends Endpoint {
                 }
             });
         } catch (Throwable ex) {
-            System.out.println("here");
             throw new RuntimeException(ex.getMessage(), ex);
         }
     }

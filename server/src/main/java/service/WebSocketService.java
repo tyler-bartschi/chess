@@ -120,6 +120,7 @@ public class WebSocketService {
         String username = auth.username();
 
         connectionContainer.removeUser(gameID, username);
+        session.close();
 
         String notification;
         if (game.whiteUsername() != null && game.whiteUsername().equals(username)) {
@@ -238,10 +239,10 @@ public class WebSocketService {
     private String notificationForConnection(GameData game, String username) {
         String notification;
 
-        if (game.whiteUsername().equals(username)) {
+        if (username.equals(game.whiteUsername())) {
             // joined as a white player
             notification = username + " joined as WHITE";
-        } else if (game.blackUsername().equals(username)) {
+        } else if (username.equals(game.blackUsername())) {
             // joined as a black player
             notification = username + " joined as BLACK";
         } else {

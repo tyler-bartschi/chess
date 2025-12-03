@@ -220,6 +220,7 @@ public class ServerFacade {
     public String observe(int gameID) throws InputException {
         verifyMapExists();
         verifyListID(gameID);
+        lastJoinedGameID = gameIDs.get(gameID);
 
         return SET_TEXT_COLOR_GREEN + username + " observing game " +
                 gameID + RESET_TEXT_COLOR + "\n";
