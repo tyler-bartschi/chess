@@ -53,28 +53,28 @@ public class WebsocketClient implements Client {
     private void displayGame(LoadGameMessage message) {
         resetLine();
         currentGame = message.getGame();
-        boardRenderer.renderGameBoard(teamColor, currentGame.getBoard());
+        System.out.println(boardRenderer.renderGameBoard(teamColor, currentGame.getBoard()));
         printPrompt();
     }
 
     private void displayNotification(NotificationMessage message) {
         resetLine();
-        System.out.println(SET_TEXT_COLOR_GREEN + message.getMessage());
+        System.out.println(SET_TEXT_COLOR_GREEN + message.getMessage() + RESET_TEXT_COLOR);
         printPrompt();
     }
 
     private void displayError(ErrorMessage message) {
         resetLine();
-        System.out.println(SET_TEXT_COLOR_RED + message.getErrorMessage());
+        System.out.println(SET_TEXT_COLOR_RED + message.getErrorMessage() + RESET_TEXT_COLOR);
         printPrompt();
     }
 
     private void resetLine() {
-        System.out.println(ERASE_LINE + SET_TEXT_BOLD + "[PLAYING]" + RESET_TEXT_BOLD_FAINT + " >>>");
+        System.out.println();
     }
 
     private void printPrompt() {
-        System.out.println("\n" + SET_TEXT_BOLD + "[PLAYING]" + RESET_TEXT_BOLD_FAINT + " >>>");
+        System.out.print("\n" + SET_TEXT_BOLD + "[PLAYING]" + RESET_TEXT_BOLD_FAINT + " >>> ");
     }
 
     public UICommand execute(String[] tokens) throws InputException, WebsocketException {
@@ -120,7 +120,7 @@ public class WebsocketClient implements Client {
     private void printHelp() {
         printBlueAndWhite("redraw ", "- redraws the chess board");
         printBlueAndWhite("leave ", "- leaves the game");
-        printBlueAndWhite("move <StartRow><StartColumn> <EndRow><EndColumn> ", "- makes a chess move");
+        printBlueAndWhite("move <StartColumn><StartRow> <EndColumn><EndRow> ", "- makes a chess move");
         printBlueAndWhite("resign ", "- forfeits the game, other player wins");
         printBlueAndWhite("highlight <row> <column> ", "- highlights possible moves for the piece on the given row and column");
         printBlueAndWhite("help ", "- display all possible commands");
@@ -134,7 +134,7 @@ public class WebsocketClient implements Client {
             throw new InputException("Too many parameters provided. 'redraw' takes no parameters");
         }
 
-        boardRenderer.renderGameBoard(teamColor, currentGame.getBoard());
+        System.out.println(boardRenderer.renderGameBoard(teamColor, currentGame.getBoard()));
     }
 
     private void leaveGame(String[] params) throws InputException, WebsocketException {
@@ -209,15 +209,15 @@ public class WebsocketClient implements Client {
         ChessMove desiredMove = null;
 
         String startPositionRaw = params[0];
-        String endPositionRaw = params[0];
+        String endPositionRaw = params[1];
 
-        int startColumnNum = letterToNum(startPositionRaw.substring(1));
-        int endColumnNum = letterToNum(endPositionRaw.substring(1));
+        int startColumnNum = letterToNum(startPositionRaw.substring(0, 1));
+        int endColumnNum = letterToNum(endPositionRaw.substring(0, 1));
         checkBoundary(startColumnNum);
         checkBoundary(endColumnNum);
 
-        String startRowRaw = startPositionRaw.substring(0, 1);
-        String endRowRaw  = startPositionRaw.substring(0, 1);
+        String startRowRaw = startPositionRaw.substring(1);
+        String endRowRaw  = endPositionRaw.substring(1);
         if (startRowRaw.matches("\\d+") && endRowRaw.matches("\\d+")) {
             int startRowNum = Integer.parseInt(startRowRaw);
             int endRowNum = Integer.parseInt(endRowRaw);
@@ -242,7 +242,7 @@ public class WebsocketClient implements Client {
         boolean isPromoting = false;
         if (teamColor == ChessGame.TeamColor.WHITE && startPosition.getRow() == 7) {
             isPromoting = true;
-        } else if (startPosition.getRow() == 2) {
+        } else if (teamColor == ChessGame.TeamColor.BLACK && startPosition.getRow() == 2) {
             isPromoting = true;
         }
 
@@ -260,18 +260,17 @@ public class WebsocketClient implements Client {
         boolean running = true;
         while (running) {
             String line = scanner.nextLine();
-            pieceType = convertStringToPieceType(line);
+            pieceType = convertStringToPieceType(line.toUpperCase());
             if (pieceType != null) {
                 running = false;
+            } else {
+                System.out.println("That is not a valid piece type. Please enter: ROOK/KNIGHT/BISHOP/QUEEN");
             }
-            System.out.println("That is not a valid piece type. Please enter: ROOK/KNIGHT/BISHOP/QUEEN");
         }
         return pieceType;
     }
 
     private ChessPiece.PieceType convertStringToPieceType(String line) {
-        line = line.toUpperCase();
-
         return switch (line) {
             case "ROOK" -> ChessPiece.PieceType.ROOK;
             case "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
@@ -283,6 +282,9 @@ public class WebsocketClient implements Client {
 
     private boolean isPawn(ChessPosition position) {
         ChessPiece piece = currentGame.getBoard().getPiece(position);
+        if (piece == null) {
+            return false;
+        }
         return piece.getPieceType() == ChessPiece.PieceType.PAWN;
     }
 
