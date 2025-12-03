@@ -123,7 +123,7 @@ public class WebsocketClient implements Client {
         printBlueAndWhite("leave ", "- leaves the game");
         printBlueAndWhite("move <StartColumn><StartRow> <EndColumn><EndRow> ", "- makes a chess move");
         printBlueAndWhite("resign ", "- forfeits the game, other player wins");
-        printBlueAndWhite("highlight <row> <column> ", "- highlights possible moves for the piece on the given row and column");
+        printBlueAndWhite("highlight <column><row> ", "- highlights possible moves for the piece on the given row and column");
         printBlueAndWhite("help ", "- display all possible commands");
     }
 
@@ -182,7 +182,36 @@ public class WebsocketClient implements Client {
     }
 
     private void highlight(String[] params) throws InputException {
-        // highlights the requested piece's valid moves
+        if (params.length != 1) {
+            throw new InputException("'highlight' takes exactly one parameter: <column><row>. example: a3");
+        }
+
+        String colRaw = params[0].substring(0, 1);
+        String rowRaw = params[0].substring(1);
+        int col = letterToNum(colRaw);
+
+        if (!rowRaw.matches("\\d+")) {
+            throw new InputException("Must provide a number for the row");
+        }
+
+        int row = Integer.parseInt(rowRaw);
+        checkBoundary(row);
+
+        ChessPosition highlightedPosition = new ChessPosition(row, col);
+        Collection<ChessMove> possibleMoves = currentGame.validMoves(highlightedPosition);
+
+        if (possibleMoves == null) {
+            System.out.println(boardRenderer.renderGameBoard(teamColor, currentGame.getBoard(), new ArrayList<int[]>()));
+            return;
+        }
+
+        ArrayList<int[]> highlights = new ArrayList<>();
+        highlights.add(new int[]{row, col});
+        for (ChessMove move : possibleMoves) {
+            int[] parsedMove = {move.getEndPosition().getRow(), move.getEndPosition().getColumn()};
+            highlights.add(parsedMove);
+        }
+        System.out.println(boardRenderer.renderGameBoard(teamColor, currentGame.getBoard(), highlights));
     }
 
     private void checkMoveValidity(ChessMove move) throws InputException {
