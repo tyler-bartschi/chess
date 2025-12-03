@@ -76,7 +76,7 @@ public class WebsocketFacade extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
-        this.session = session;
+        // don't do anything with it apparently
     }
 
     private void sendMessage(UserGameCommand command) throws WebsocketException {

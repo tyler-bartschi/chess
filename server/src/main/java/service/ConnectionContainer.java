@@ -34,48 +34,34 @@ public class ConnectionContainer {
         checkIfGameExists(gameID);
         ArrayList<Tuple> users = gameTracker.get(gameID);
 
-        Tuple toRemove = null;
+        Tuple temp = null;
         for (Tuple user : users) {
             if (user.username().equals(username)) {
-                toRemove = user;
+                temp = new Tuple(username, user.session());
             }
         }
 
-        if (toRemove != null) {
-            users.remove(toRemove);
+        if (temp != null) {
+            users.remove(temp);
         }
     }
 
     public void sendToAll(int gameID, String message) {
         checkIfGameExists(gameID);
         ArrayList<Tuple> users = gameTracker.get(gameID);
-        if (users.isEmpty()) {
-            return;
-        }
         for (Tuple user : users) {
-            try {
-                user.send(message);
-            } catch (Throwable ex) {
-                System.out.println("Something went wrong in sendToAll: " + ex.getMessage());
-            }
+            user.send(message);
         }
     }
 
     public void sendToAllExcept(int gameID, String exceptUsername, String message) {
         checkIfGameExists(gameID);
-        ArrayList<Tuple> users = gameTracker.get(gameID);
-        if (users.isEmpty()) {
-            return;
-        }
-        for (Tuple user : users) {
-            if (!user.username().equals(exceptUsername)) {
-                try {
-                    user.send(message);
-                } catch (Throwable ex) {
-                    System.out.println("Something went wrong in sendToAllExcept: " + ex.getMessage());
-                }
-            }
-        }
+         ArrayList<Tuple> users = gameTracker.get(gameID);
+         for (Tuple user : users) {
+             if (!user.username.equals(exceptUsername)) {
+                 user.send(message);
+             }
+         }
     }
 
     private void checkIfGameExists(int gameID) {

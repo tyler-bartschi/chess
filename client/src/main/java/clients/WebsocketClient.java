@@ -20,6 +20,7 @@ public class WebsocketClient implements Client {
     private final WebsocketFacade websocketFacade;
     private final BoardRenderer boardRenderer;
     private final Gson serializer;
+    private boolean playing;
     private ChessGame.TeamColor teamColor;
     private ChessGame currentGame;
 
@@ -98,6 +99,10 @@ public class WebsocketClient implements Client {
         }
 
         return retCmd;
+    }
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
     }
 
     public void setTeamColor(ChessGame.TeamColor color) {

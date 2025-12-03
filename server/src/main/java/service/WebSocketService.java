@@ -119,6 +119,7 @@ public class WebSocketService {
         int gameID = command.getGameID();
         String username = auth.username();
 
+        connectionContainer.removeUser(gameID, username);
 
         String notification;
         if (game.whiteUsername() != null && game.whiteUsername().equals(username)) {
@@ -134,7 +135,6 @@ public class WebSocketService {
         }
 
         connectionContainer.sendToAll(gameID, serializer.toJson(new NotificationMessage(NOTIFICATION, notification)));
-        connectionContainer.removeUser(gameID, username);
     }
 
     public void resign(UserGameCommand command, Session session) throws DataAccessException {
@@ -238,10 +238,10 @@ public class WebSocketService {
     private String notificationForConnection(GameData game, String username) {
         String notification;
 
-        if (username.equals(game.whiteUsername())) {
+        if (game.whiteUsername().equals(username)) {
             // joined as a white player
             notification = username + " joined as WHITE";
-        } else if (username.equals(game.blackUsername())) {
+        } else if (game.blackUsername().equals(username)) {
             // joined as a black player
             notification = username + " joined as BLACK";
         } else {
@@ -255,7 +255,7 @@ public class WebSocketService {
         try {
             session.getRemote().sendString(message);
         } catch (Throwable ex) {
-            System.out.println("An error occurred trying to send a websocket message: " + ex.getMessage());
+            System.out.println("An error occured trying to send a websocket message: " + ex.getMessage());
         }
     }
 }
