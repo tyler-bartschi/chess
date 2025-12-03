@@ -90,7 +90,8 @@ public class WebSocketService {
             if (newGame.isInCheckmate(opposingColor)) {
                 // is in checkmate, end game and send notification
                 updatedGame = setGameOver(updatedGame);
-                String endMessage = serializer.toJson(new NotificationMessage(NOTIFICATION, opposingColor + " is now in CHECKMATE. Game over."));
+                String userInCheckmate = opposingColor == ChessGame.TeamColor.WHITE ? updatedGame.whiteUsername() : updatedGame.blackUsername();
+                String endMessage = serializer.toJson(new NotificationMessage(NOTIFICATION, userInCheckmate + "(" + opposingColor + ") is now in CHECKMATE. Game over."));
                 connectionContainer.sendToAll(gameID, endMessage);
             } else if (newGame.isInStalemate(opposingColor)) {
                 // is in stalemate, end game and send notification
@@ -99,7 +100,8 @@ public class WebSocketService {
                 connectionContainer.sendToAll(gameID, endMessage);
             } else if (newGame.isInCheck(opposingColor)) {
                 // opposing is in check, send notification
-                String newNotification = serializer.toJson(new NotificationMessage(NOTIFICATION, opposingColor + " is now in CHECK."));
+                String userInCheck = opposingColor == ChessGame.TeamColor.WHITE ? updatedGame.whiteUsername() : updatedGame.blackUsername();
+                String newNotification = serializer.toJson(new NotificationMessage(NOTIFICATION, userInCheck + "(" + opposingColor + ") is now in CHECK."));
                 connectionContainer.sendToAll(gameID, newNotification);
             }
 

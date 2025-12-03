@@ -86,9 +86,11 @@ public class ChessBoard {
 
         if (pieceType == ChessPiece.PieceType.KING && moveManager.kingWantsCastle(move)) {
             moveRookForCastle(move);
-        } else if (pieceType == ChessPiece.PieceType.PAWN && moveManager.pawnWantsEnPassant(this, move)) {
-            removeEnPassantPawn(move);
-        } else if (move.getPromotionPiece() != null) {
+        }
+//        else if (pieceType == ChessPiece.PieceType.PAWN && moveManager.pawnWantsEnPassant(this, move)) {
+//            removeEnPassantPawn(move);
+//        }
+        else if (move.getPromotionPiece() != null) {
             currentPiece = new ChessPiece(currentPiece.getTeamColor(), move.getPromotionPiece());
         }
 

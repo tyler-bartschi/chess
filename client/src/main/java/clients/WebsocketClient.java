@@ -20,6 +20,7 @@ public class WebsocketClient implements Client {
     private final WebsocketFacade websocketFacade;
     private final BoardRenderer boardRenderer;
     private final Gson serializer;
+    private boolean playing;
     private ChessGame.TeamColor teamColor;
     private ChessGame currentGame;
 
@@ -104,8 +105,9 @@ public class WebsocketClient implements Client {
         teamColor = color;
     }
 
-    public void activate(String authToken, int gameID) throws WebsocketException {
+    public void activate(String authToken, int gameID, boolean playing) throws WebsocketException {
         // activate the websocketFacade
+        this.playing = playing;
         websocketFacade.setServerMessageObserver(new ServerMessageObserver());
         websocketFacade.setAuthToken(authToken);
         websocketFacade.setGameID(gameID);
@@ -145,6 +147,12 @@ public class WebsocketClient implements Client {
             throw new InputException("'move' requires exactly two parameters. <StartRow><StartColumn> and <EndRow><EndColumn>");
         }
 
+        ChessGame.TeamColor currentColor = currentGame.getTeamTurn();
+        if (teamColor != currentColor) {
+            throw new InputException("It is not your turn, cannot make a move");
+        }
+
+
         ChessMove move = parseMove(params);
         checkMoveValidity(move);
 
@@ -154,6 +162,10 @@ public class WebsocketClient implements Client {
     private void resign(String[] params) throws InputException, WebsocketException {
         if (params.length != 0) {
             throw new InputException("Too many parameters provided. 'resign' takes no parameters");
+        }
+
+        if (!playing) {
+            throw new InputException("You are an observer, you cannot resign");
         }
 
         Scanner scanner = new Scanner(System.in);
@@ -227,6 +239,9 @@ public class WebsocketClient implements Client {
 
         ChessPosition startPosition = move.getStartPosition();
         Collection<ChessMove> possibleMoves = currentGame.validMoves(startPosition);
+        if (possibleMoves == null) {
+            throw new InputException("There are no moves possible with that position.");
+        }
         if (!possibleMoves.contains(move)) {
             throw new InputException("That is not a valid move. Please try again.");
         }
@@ -320,7 +335,7 @@ public class WebsocketClient implements Client {
         if (piece == null) {
             return false;
         }
-        return piece.getPieceType() == ChessPiece.PieceType.PAWN;
+        return piece.getPieceType() == ChessPiece.PieceType.PAWN && piece.getTeamColor() == teamColor;
     }
 
     private void checkBoundary(int num) throws InputException {
