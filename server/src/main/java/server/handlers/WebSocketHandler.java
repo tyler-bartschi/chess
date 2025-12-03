@@ -25,7 +25,7 @@ public class WebSocketHandler extends AuthVerificationHandler {
            System.out.println("Websocket connection made");
         });
         ws.onMessage(this::onMessage);
-        ws.onClose(_ -> System.out.println("Websocket closed"));
+        ws.onClose(ctx -> System.out.println("Websocket closed"));
     }
 
     public void onMessage(WsMessageContext ctx) throws UnauthorizedException, DataAccessException, InvalidRequestException {
