@@ -11,6 +11,7 @@ import ui.BoardRenderer;
 import static utils.ClientUtils.*;
 import static ui.EscapeSequences.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
@@ -53,7 +54,7 @@ public class WebsocketClient implements Client {
     private void displayGame(LoadGameMessage message) {
         resetLine();
         currentGame = message.getGame();
-        System.out.println(boardRenderer.renderGameBoard(teamColor, currentGame.getBoard()));
+        System.out.println(boardRenderer.renderGameBoard(teamColor, currentGame.getBoard(), new ArrayList<int[]>()));
         printPrompt();
     }
 
@@ -134,7 +135,7 @@ public class WebsocketClient implements Client {
             throw new InputException("Too many parameters provided. 'redraw' takes no parameters");
         }
 
-        System.out.println(boardRenderer.renderGameBoard(teamColor, currentGame.getBoard()));
+        System.out.println(boardRenderer.renderGameBoard(teamColor, currentGame.getBoard(), new ArrayList<int[]>()));
     }
 
     private void leaveGame(String[] params) throws InputException, WebsocketException {

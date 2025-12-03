@@ -2,6 +2,8 @@ package ui;
 
 import chess.*;
 
+import java.util.ArrayList;
+
 import static ui.EscapeSequences.*;
 
 public class BoardRenderer {
@@ -12,7 +14,7 @@ public class BoardRenderer {
 
     }
 
-    public String renderGameBoard(ChessGame.TeamColor team, ChessBoard board) {
+    public String renderGameBoard(ChessGame.TeamColor team, ChessBoard board, ArrayList<int[]> highlights) {
         result = new StringBuilder();
         // white on bottom, black on top by default
         String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
@@ -23,7 +25,7 @@ public class BoardRenderer {
         }
 
         addLetterPositions(letters);
-        buildGameBoard(numbers, board, team);
+        buildGameBoard(numbers, board, team, highlights);
         addLetterPositions(letters);
         return result.toString();
     }
@@ -36,33 +38,40 @@ public class BoardRenderer {
         result.append(EMPTY).append(RESET_BG_COLOR).append(RESET_TEXT_COLOR).append("\n");
     }
 
-    private void buildGameBoard(String[] numbers, ChessBoard board, ChessGame.TeamColor team) {
+    private void buildGameBoard(String[] numbers, ChessBoard board, ChessGame.TeamColor team, ArrayList<int[]> highlights) {
         for (String number : numbers) {
-            buildOneLine(number, board, team);
+            buildOneLine(number, board, team, highlights);
         }
     }
 
-    private void buildOneLine(String number, ChessBoard board, ChessGame.TeamColor team) {
+    private void buildOneLine(String number, ChessBoard board, ChessGame.TeamColor team, ArrayList<int[]> highlights) {
         int num = Integer.parseInt(number);
         boolean isWhite = (team == ChessGame.TeamColor.WHITE) == (num % 2 == 0);
         String printableNum = " " + number + " ";
         result.append(SET_BG_COLOR_WHITE).append(SET_TEXT_COLOR_BLACK).append(printableNum).append(RESET_TEXT_COLOR);
         if (team == ChessGame.TeamColor.WHITE) {
             for (int i = 1; i < 9; i++) {
-                String bgColor = isWhite ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
-                result.append(bgColor).append(getPieceForPosition(num, i, board));
-                isWhite = !isWhite;
+                isWhite = insertIntoLine(i, board, num, highlights, isWhite);
             }
         } else {
             for (int i = 8; i >= 1; i--) {
-                String bgColor = isWhite ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
-                result.append(bgColor).append(getPieceForPosition(num, i, board));
-                isWhite = !isWhite;
+                isWhite = insertIntoLine(i, board, num, highlights, isWhite);
             }
         }
 
         result.append(SET_BG_COLOR_WHITE).append(SET_TEXT_COLOR_BLACK).append(printableNum)
                 .append(RESET_BG_COLOR).append(RESET_TEXT_COLOR).append("\n");
+    }
+
+    private boolean insertIntoLine(int i, ChessBoard board, int num, ArrayList<int[]> highlights, boolean isWhite) {
+        String bgColor;
+        if (highlights.contains(new int[]{num, i})) {
+            bgColor = isWhite ? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN;
+        } else {
+            bgColor = isWhite ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_BLACK;
+        }
+        result.append(bgColor).append(getPieceForPosition(num, i, board));
+        return !isWhite;
     }
 
     private String getPieceForPosition(int row, int col, ChessBoard board) {
