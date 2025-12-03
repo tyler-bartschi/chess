@@ -1,12 +1,15 @@
 package clients;
 
 import chess.*;
+import websocket.messages.*;
+import com.google.gson.Gson;
 import facades.WebsocketException;
 import facades.WebsocketFacade;
 import ui.InputException;
 import ui.UI.UICommand;
 import ui.BoardRenderer;
 import static utils.ClientUtils.*;
+import static ui.EscapeSequences.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,6 +18,7 @@ import java.util.Scanner;
 public class WebsocketClient implements Client {
     private final WebsocketFacade websocketFacade;
     private final BoardRenderer boardRenderer;
+    private final Gson serializer;
     private boolean playing;
     private ChessGame.TeamColor teamColor;
     private ChessGame currentGame;
@@ -22,6 +26,7 @@ public class WebsocketClient implements Client {
     public WebsocketClient(WebsocketFacade websocketFacade) {
         this.websocketFacade = websocketFacade;
         boardRenderer = new BoardRenderer();
+        serializer = new Gson();
         this.currentGame = null;
     }
 
@@ -30,10 +35,46 @@ public class WebsocketClient implements Client {
         public ServerMessageObserver() {
         }
 
-        public void onMessage(String message) {
-            System.out.println(message);
+        public void onMessage(String text) {
+            if (text.contains("LOAD_GAME")) {
+                LoadGameMessage message = serializer.fromJson(text, LoadGameMessage.class);
+                displayGame(message);
+            } else if (text.contains("NOTIFICATION")) {
+                NotificationMessage message = serializer.fromJson(text, NotificationMessage.class);
+                displayNotification(message);
+            } else if (text.contains("ERROR")) {
+                ErrorMessage message = serializer.fromJson(text, ErrorMessage.class);
+                displayError(message);
+            }
         }
 
+    }
+
+    private void displayGame(LoadGameMessage message) {
+        resetLine();
+        currentGame = message.getGame();
+        boardRenderer.renderGameBoard(teamColor, currentGame.getBoard());
+        printPrompt();
+    }
+
+    private void displayNotification(NotificationMessage message) {
+        resetLine();
+        System.out.println(SET_TEXT_COLOR_GREEN + message.getMessage());
+        printPrompt();
+    }
+
+    private void displayError(ErrorMessage message) {
+        resetLine();
+        System.out.println(SET_TEXT_COLOR_RED + message.getErrorMessage());
+        printPrompt();
+    }
+
+    private void resetLine() {
+        System.out.println(ERASE_LINE + SET_TEXT_BOLD + "[PLAYING]" + RESET_TEXT_BOLD_FAINT + " >>>");
+    }
+
+    private void printPrompt() {
+        System.out.println("\n" + SET_TEXT_BOLD + "[PLAYING]" + RESET_TEXT_BOLD_FAINT + " >>>");
     }
 
     public UICommand execute(String[] tokens) throws InputException, WebsocketException {
@@ -155,7 +196,6 @@ public class WebsocketClient implements Client {
             throw new InputException("That is not a valid move. Please try again.");
         }
     }
-
 
     private boolean isYes(String line) {
         return line.equalsIgnoreCase("y") || line.equalsIgnoreCase("yes");
